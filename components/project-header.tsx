@@ -22,11 +22,11 @@ export function ProjectHeader() {
         </h1>
 
         <p className="mt-5 text-lg text-fg-secondary leading-relaxed max-w-3xl">
-          A working roadmap of the four GTM workflow automations I would prioritize as Harvey's
+          A working roadmap of the four GTM workflow automations I would prioritize as Harvey&apos;s
           first GTM Business Analyst hire. Each ticket diagnoses a real bottleneck, scopes the
-          architecture against Harvey's actual stack, and ships against measurable validation
-          criteria. Decomposed using the same five-layer framework I built and validated five times
-          across construction trades at Airtight Builds.
+          architecture against Harvey&apos;s actual stack, and ships against measurable validation
+          criteria. Decomposed using the same five-layer framework I built into a vertical AI agent
+          for construction spec review and validated across five different trades.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">

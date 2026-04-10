@@ -30,19 +30,22 @@ export default function AboutPage() {
             </p>
 
             <p>
-              The unsexy ticket is on the board on purpose. James told me directly that the panel
-              needs to see core BA fundamentals before they trust me with the AI building work. So
-              the first ticket I would actually pick up at Harvey is the enrichment vendor
-              consolidation audit. Pure project management, ticket discipline, follow-through on
-              delivery. The building comes after.
+              GTM-002 is the Firecrawl ticket. It is the structured answer to the question James
+              asked me in our DMs on April 10 about how to extract law firm client lists with
+              Firecrawl. James told me directly that the panel needs to see core BA fundamentals
+              before they trust me with the AI building work, so the way I would actually pick that
+              ticket up is the unsexy way: validate the prompt against five known firms, build the
+              post-processing layer, ship to one canary AE pod, measure, iterate. Project
+              management, ticket discipline, follow-through on delivery. The building comes
+              wrapped in the BA work, not separate from it.
             </p>
 
             <p>
-              The four-ticket scope is deliberately small. I picked the workflows that I believe
-              create the most leverage in the first 90 days, that surface the most useful diagnostic
-              about how Harvey&apos;s GTM machine actually works, and that demonstrate the systems
-              thinking I would bring to the role. Eight more would be easy to write. Four is the
-              right number to defend in a one-hour conversation.
+              The four-ticket scope is deliberately small. I picked the workflows that create the
+              most leverage in the first 90 days, that surface the most useful diagnostic about how
+              Harvey&apos;s GTM machine actually works, and that demonstrate the systems thinking I
+              would bring to the role. Eight more would be easy to write. Four is the right number
+              to defend in a one-hour conversation.
             </p>
 
             <h2 className="font-serif text-xl font-medium text-fg-primary mt-12 mb-3">
@@ -50,8 +53,8 @@ export default function AboutPage() {
             </h2>
             <p>
               Each ticket&apos;s architecture is decomposed using the same five-layer pattern I
-              developed building Airtight Builds, my production vertical AI system for construction
-              specification review. Five trades, ~6,300 patterns, 719 tests, real paying customers.
+              developed building a vertical AI agent for construction spec review. ~6,300 patterns,
+              719 tests, deployed in production across five different trades.
             </p>
             <p>
               The framework: Layer 1 input normalization. Layer 2 deterministic pre-processing
@@ -61,13 +64,14 @@ export default function AboutPage() {
               observability, validation.
             </p>
             <p>
-              I validated this framework five times across different construction trades —
-              elevator, electrical, mechanical, fire protection, plumbing — adding the fifth trade
-              required zero changes to the existing four. That is the proof that the framework
-              generalizes. Different domain, same architecture.
+              I validated this framework across five different construction trades — elevator,
+              electrical, mechanical, fire protection, plumbing — by treating each trade as a
+              plugin into the same registry-based dispatch. Adding the fifth trade required zero
+              changes to the existing four. That is the proof that the framework generalizes.
+              Different domain. Same architecture.
             </p>
             <p>
-              The full Airtight story is here:{" "}
+              The full story behind the agent is here:{" "}
               <a
                 href="https://airtight-story.vercel.app"
                 className="text-accent-forest hover:underline"

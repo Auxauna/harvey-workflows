@@ -216,6 +216,15 @@ export const TOOLS: Record<string, Tool> = {
     role:
       "Pulled in real-time for pre-call brief generation. Used to surface recent posts, job changes, and shared connections.",
   },
+  firecrawl: {
+    id: "firecrawl",
+    name: "Firecrawl",
+    category: "data",
+    description:
+      "Web scraping and crawling API with an /agent endpoint that takes a natural-language prompt and returns structured data extracted from any public website. Handles JS rendering, pagination, and rate limiting natively.",
+    role:
+      "James is currently piloting Firecrawl. The /agent endpoint is the right primitive for any structured extraction problem against the public web — law firm sites, attorney bios, deal tombstones, anywhere the data is not already in an API.",
+  },
 };
 
 export function getTool(id: string): Tool | undefined {
