@@ -95,9 +95,9 @@ export const TOOLS: Record<string, Tool> = {
     name: "Workato",
     category: "orchestration",
     description:
-      "Enterprise iPaaS for orchestrating synchronous and event-driven workflows across SaaS tools and data systems.",
+      "Enterprise iPaaS for orchestrating synchronous and event-driven workflows across SaaS tools and data systems. Workato Enterprise MCP (launched Feb 2026) exposes recipes as callable services for external AI agents.",
     role:
-      "Glue layer for cross-tool automations. Recipes route data, trigger workflows, and handle conditional logic across the stack.",
+      "Glue layer for cross-tool automations. Recipes route data, trigger workflows, and handle conditional logic across the stack. Workato Genies act as autonomous agents for multi-step business processes.",
   },
   fivetran: {
     id: "fivetran",
@@ -113,9 +113,9 @@ export const TOOLS: Record<string, Tool> = {
     name: "Snowflake",
     category: "warehouse",
     description:
-      "Cloud data warehouse and AI Data Cloud. The analytical source of truth for the business.",
+      "Cloud data warehouse and AI Data Cloud. Cortex AI Functions (GA November 2025) and Cortex Agents enable running Claude and other models inline against warehouse data without leaving the system.",
     role:
-      "Where every GTM dataset lands. Analytics, scoring models, and Cortex-powered AI compute all run here.",
+      "Where every GTM dataset lands. Analytics, scoring models, attribution, and Cortex-powered AI compute all run here. The single source of truth that other workflows read from.",
   },
   linear: {
     id: "linear",
@@ -140,9 +140,9 @@ export const TOOLS: Record<string, Tool> = {
     name: "Qualified",
     category: "chat",
     description:
-      "Conversational sales platform with Piper, an AI SDR agent that qualifies and routes inbound web visitors in real-time.",
+      "Conversational sales platform with Piper, an AI SDR agent that qualifies and routes inbound web visitors in real-time. Acquired by Salesforce in December 2025; being integrated into Agentforce.",
     role:
-      "Front door for inbound web traffic. Qualifies anonymous visitors, books meetings directly to AE calendars, syncs to SFDC.",
+      "Front door for inbound web traffic. Qualifies anonymous visitors, books meetings directly to AE calendars, syncs natively to SFDC. Post-acquisition, Piper is moving inside the Agentforce platform.",
   },
   gong: {
     id: "gong",
