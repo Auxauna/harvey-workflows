@@ -254,7 +254,7 @@ export const TICKETS: Ticket[] = [
     effort: "2 weeks",
     sprint: "Month 1",
     status: "ready",
-    reporter: "James Hunsberger, Head of GTM Technology",
+    reporter: "GTM Technology",
     labels: ["prospecting", "intelligence", "firecrawl", "relationship-graph"],
     oneLiner:
       "Build a Firecrawl /agent workflow that extracts every named client company from a law firm's public website. Surfaces the corporate relationships hiding in attorney bios.",
@@ -267,7 +267,7 @@ export const TICKETS: Ticket[] = [
       payback: "First closed cross-sell deal sourced from the graph",
     },
     background: [
-      "James asked me directly on April 10: 'Some firms list out what companies they work with. How would you structure the firecrawl query to look to see what customers are listed?' This ticket is the structured answer.",
+      "Operating question that surfaced in sync: how do we structure a Firecrawl /agent query to extract every named client company from a law firm's public website at scale? This ticket is the structured answer.",
       "The hard part is not the crawl. It's that law firm websites do not have SaaS-style logo walls. Client data is scattered across three different surfaces, and a naive crawl misses the majority of the value:",
       "1. Representative Experience sections under each practice group. Cleanest source — direct, attributed, contextual.",
       "2. Client lists. Rare. Mostly boutiques. Easy when present, absent at most major firms.",
@@ -406,7 +406,7 @@ export const TICKETS: Ticket[] = [
       },
     ],
     whyThisMatters:
-      "James asked me how to structure this query in our LinkedIn DMs on April 10. This ticket is the structured answer, scoped against the actual constraint (client data lives in three places, not one), decomposed into shippable phases, and built on the exact tool he is currently piloting. It also unlocks an entire layer of GTM intelligence Harvey does not have today: a relationship graph between law firms and their corporate clients. That graph is rocket fuel for Harvey's corporate legal motion. Every Fortune 500 a customer firm works with becomes a warm lead. The same /agent pattern reuses for any structured extraction problem against the public web — that is the framework, not the one-off.",
+      "This ticket is the structured answer to a real operating question for the corporate legal motion: how do we extract every named client company from a law firm's public website at scale? Scoped against the actual constraint (client data lives in three places, not one), decomposed into shippable phases, and built on Firecrawl /agent — the tool already in pilot. It unlocks an entire layer of GTM intelligence Harvey does not have today: a relationship graph between law firms and their corporate clients. That graph is rocket fuel for Harvey's corporate legal motion. Every Fortune 500 a customer firm works with becomes a warm lead. The same /agent pattern reuses for any structured extraction problem against the public web — that is the framework, not the one-off.",
   },
 
   {

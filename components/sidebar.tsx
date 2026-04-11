@@ -72,15 +72,15 @@ export function Sidebar() {
 
       <div className="hairline-t px-5 py-4">
         <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
-          Built by
+          Function
         </div>
-        <div className="text-sm text-fg-primary mt-1">Jacob Rucker</div>
-        <div className="text-xs text-fg-subtle mt-0.5">For James Hunsberger</div>
+        <div className="text-sm text-fg-primary mt-1">GTM Technology</div>
+        <div className="text-xs text-fg-subtle mt-0.5">First 90 Days · Q2 2026</div>
         <Link
           href="/about"
           className="font-mono text-[11px] text-accent-forest hover:underline mt-2 inline-block"
         >
-          About this artifact →
+          About this roadmap →
         </Link>
       </div>
     </aside>

@@ -126,7 +126,7 @@ export default async function TicketPage({
               ← Back to all tickets
             </Link>
             <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
-              Built by Jacob Rucker · For James Hunsberger · April 2026
+              GTM Technology · First 90 Days · Q2 2026
             </div>
           </div>
         </div>

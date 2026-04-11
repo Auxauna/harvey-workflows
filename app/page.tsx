@@ -29,12 +29,12 @@ export default function Home() {
               How to read this board
             </div>
             <p className="text-sm text-fg-secondary leading-relaxed font-serif">
-              Each ticket is structured as a real Linear-style issue, written in the voice Drew
-              Bredvick uses for Vercel&apos;s GTM agents: shadow the best performer, scope
-              ruthlessly, vibe code the prototype, ship the weekend MVP, measure the ROI. GTM-002
-              is the structured answer to the Firecrawl question James asked me in our DMs on
-              April 10. Every ticket leads with the problem, names the top performer move, and
-              shows the ROI math before the architecture.
+              Each ticket is structured as a real Linear-style issue. Every ticket leads with the
+              problem, names the top performer&apos;s existing move, and shows the ROI math
+              before the architecture. The principles repeat across all four: shadow the best
+              performer first, scope ruthlessly, ship the weekend MVP, measure the multiplier,
+              treat Slack as the human-in-the-loop surface. GTM-002 is the structured answer to
+              the Firecrawl extraction problem on law firm client data.
             </p>
           </div>
         </div>

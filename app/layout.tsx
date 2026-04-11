@@ -26,12 +26,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Harvey GTM Technology — First 90 Days",
   description:
-    "A working roadmap of GTM workflow automations for Harvey's first GTM Business Analyst hire. Built by Jacob Rucker, April 2026.",
-  authors: [{ name: "Jacob Rucker" }],
+    "A working charter for the GTM Technology function at Harvey. First 90 days, Q2 2026.",
   openGraph: {
     title: "Harvey GTM Technology — First 90 Days",
     description:
-      "A working roadmap of GTM workflow automations for Harvey's first GTM Business Analyst hire.",
+      "A working charter for the GTM Technology function at Harvey.",
     type: "website",
   },
   robots: {

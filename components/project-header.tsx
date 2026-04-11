@@ -9,32 +9,32 @@ export function ProjectHeader() {
       <div className="max-w-5xl">
         <div className="flex items-center gap-3 mb-3">
           <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-accent-forest">
-            Project
+            Charter
           </span>
           <span className="h-px w-8 bg-border-strong" />
           <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
-            GTM Technology Roadmap
+            GTM Technology
           </span>
         </div>
 
         <h1 className="font-serif text-5xl font-medium text-fg-primary leading-[1.05] tracking-tight">
-          First 90 Days at Harvey
+          First 90 Days
         </h1>
 
         <p className="mt-5 text-lg text-fg-secondary leading-relaxed max-w-3xl">
-          A working roadmap of four GTM workflow automations I would prioritize as Harvey&apos;s
-          first GTM Business Analyst hire. Each ticket follows the shape Drew Bredvick built into
-          Vercel&apos;s first GTM agent — shadow the best performer, scope ruthlessly, ship the
-          weekend MVP, measure the ROI. Built on Harvey&apos;s actual GTM stack and the Vercel AI
-          primitives Drew uses internally.
+          A working charter for the first 90 days of GTM Technology at Harvey. The mandate:
+          encode what the top performers in every GTM seat already do by hand, measure what that
+          work is worth in rep time and pipeline impact, and ship the automations that give the
+          time back. What follows is how we&apos;re framing the first 90 days, and a starter set
+          of workflow examples showing how the work ships.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
-          <Stat label="Tickets" value={String(totalEffort)} />
+          <Stat label="Function" value="GTM Technology" />
+          <Stat label="Sprint" value="First 90 Days" />
+          <Stat label="Quarter" value="Q2 2026" />
+          <Stat label="Workflow Examples" value={String(totalEffort)} />
           <Stat label="Tools in Stack" value={String(stackSize)} />
-          <Stat label="Built By" value="Jacob Rucker" />
-          <Stat label="For" value="James Hunsberger" />
-          <Stat label="Date" value="April 2026" />
         </div>
       </div>
     </header>

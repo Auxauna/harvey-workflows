@@ -1,5 +1,4 @@
-// Harvey's actual GTM tool stack, per James Hunsberger's LinkedIn message.
-// Tools are referenced across tickets to show stack awareness.
+// Harvey's actual GTM tool stack. Tools are referenced across tickets to show stack awareness.
 
 export type ToolCategory =
   | "enrichment"
@@ -223,7 +222,7 @@ export const TOOLS: Record<string, Tool> = {
     description:
       "Web scraping and crawling API with an /agent endpoint that takes a natural-language prompt and returns structured data extracted from any public website. Handles JS rendering, pagination, and rate limiting natively.",
     role:
-      "James is currently piloting Firecrawl. The /agent endpoint is the right primitive for any structured extraction problem against the public web — law firm sites, attorney bios, deal tombstones, anywhere the data is not already in an API.",
+      "Currently in pilot at Harvey. The /agent endpoint is the right primitive for any structured extraction problem against the public web — law firm sites, attorney bios, deal tombstones, anywhere the data is not already in an API.",
   },
 };
 
