@@ -23,10 +23,11 @@ export default function AboutPage() {
             </p>
 
             <p>
-              Each ticket is structured as a real Linear-style issue. Background. Acceptance
-              criteria. Architecture decomposed into a repeatable five-layer pattern. Full stack
-              against Harvey&apos;s actual tools — the ones James shared with me on LinkedIn.
-              Phased implementation plan. Risks with mitigations. Measurable validation criteria.
+              Each ticket is structured as a real Linear-style issue. The problem. The top
+              performer move. Acceptance criteria. The agent build. The stack. The ROI math. A
+              weekend-MVP-then-iterate ship plan. What could go wrong. How we know it&apos;s
+              working. Why it matters. Every ticket is scoped against Harvey&apos;s actual tools —
+              the ones James shared with me on LinkedIn.
             </p>
 
             <p>
@@ -49,29 +50,33 @@ export default function AboutPage() {
             </p>
 
             <h2 className="font-serif text-xl font-medium text-fg-primary mt-12 mb-3">
-              The five-layer framework
+              The blueprint
             </h2>
             <p>
-              Each ticket&apos;s architecture is decomposed using the same five-layer pattern I
-              developed building a vertical AI agent for construction spec review. ~6,300 patterns,
-              719 tests, deployed in production across five different trades.
+              I structured these tickets the way Drew Bredvick at Vercel structures GTM agent
+              work. Drew built Vercel&apos;s first GTM agent in a weekend — $60K/year in
+              engineering cost, $2M/year in headcount savings, 32x ROI — by shadowing the best
+              performer first, picking 10x leverage problems, vibe coding the prototype, and
+              using Slack as the human-in-the-loop approval surface. That is the model.
             </p>
             <p>
-              The framework: Layer 1 input normalization. Layer 2 deterministic pre-processing
-              (cheap, fast, no AI). Layer 3 AI generation with the right model for the job. Layer 4
-              deterministic post-processing (validation, dedup, formatting). Layer 5 delivery into
-              the user&apos;s existing surfaces. Plus three cross-cutting concerns: memory,
-              observability, validation.
+              Every ticket on this board follows Drew&apos;s Sense → Decide → Act → Record loop.
+              Sense the state of a real system. Decide via Claude with as much context as
+              possible. Act through APIs into Harvey&apos;s existing tools. Record everything so
+              the human can trust it. The architecture diagrams show the loop as it manifests in
+              each specific workflow — different tools per ticket, same shape.
             </p>
             <p>
-              I validated this framework across five different construction trades — elevator,
-              electrical, mechanical, fire protection, plumbing — by treating each trade as a
-              plugin into the same registry-based dispatch. Adding the fifth trade required zero
-              changes to the existing four. That is the proof that the framework generalizes.
-              Different domain. Same architecture.
+              Every ticket also starts with the top performer&apos;s actual workflow, scopes a
+              single high-leverage problem, frames the build as a weekend-MVP-then-iterate plan,
+              and treats Slack as the canonical delivery surface. I built a vertical AI agent for
+              construction spec review across five trades on the side, so I know how to ship
+              production AI in a domain. But the GTM context calls for Drew&apos;s voice, not my
+              construction-extraction voice. They are different problems and they deserve
+              different shapes.
             </p>
             <p>
-              The full story behind the agent is here:{" "}
+              The full story behind the construction agent is here:{" "}
               <a
                 href="https://airtight-story.vercel.app"
                 className="text-accent-forest hover:underline"

@@ -1,7 +1,13 @@
-export function BackgroundSection({ background }: { background: string[] }) {
+export function BackgroundSection({
+  background,
+  label = "Background",
+}: {
+  background: string[];
+  label?: string;
+}) {
   return (
     <section>
-      <SectionHeader label="Background" />
+      <SectionHeader label={label} />
       <div className="space-y-4 text-fg-secondary leading-relaxed">
         {background.map((para, i) => (
           <p key={i} className="text-[15px]">

@@ -30,6 +30,13 @@ export interface ValidationMetric {
   why: string;
 }
 
+export interface RoiMath {
+  cost: string;
+  savings: string;
+  multiplier: string;
+  payback: string;
+}
+
 export interface Ticket {
   id: string;
   title: string;
@@ -40,6 +47,8 @@ export interface Ticket {
   reporter: string;
   labels: string[];
   oneLiner: string;
+  topPerformerMove?: string;
+  roiMath?: RoiMath;
   background: string[];
   acceptanceCriteria: string[];
   architecture: ArchitectureLayer[];
@@ -62,6 +71,14 @@ export const TICKETS: Ticket[] = [
     labels: ["sales-enablement", "rep-productivity", "easy-win"],
     oneLiner:
       "Auto-generate a one-page meeting brief 30 minutes before every external meeting and deliver it to the rep's inbox and Slack.",
+    topPerformerMove:
+      "Your best AE already builds her own pre-call brief by hand. She has six tabs open: Salesforce, Gong, ZoomInfo, LinkedIn, Clay, last quarter's deal review notes. Thirty minutes of synthesis before every meeting. The agent shadows her exact process — same sources, same priorities, same talking-point hierarchy — and ships the brief to her inbox before she'd have even opened the first tab.",
+    roiMath: {
+      cost: "$15K eng + ~$2K/mo Claude API",
+      savings: "~$3M/yr in rep prep time across 30 reps × 8 meetings × 30 min",
+      multiplier: "200x first-year return",
+      payback: "4 days after canary pod launch",
+    },
     background: [
       "Reps spend 30 to 45 minutes researching accounts before every external meeting. Pulling from Salesforce for account history, Gong for last-call notes, ZoomInfo and Clay for firmographic detail, and LinkedIn for the contact's recent activity. The data exists. The work of assembling it is the bottleneck.",
       "Rough math: ~8 external meetings per day per rep × 30 minutes of prep × 30 reps = ~120 hours per day across the sales team spent on research that should be automated. Annualized that is roughly $3M of fully-loaded rep time spent assembling information that already lives in our systems.",
@@ -79,38 +96,38 @@ export const TICKETS: Ticket[] = [
     architecture: [
       {
         layer: 1,
-        name: "Input — Calendar Trigger",
+        name: "Sense — Salesforce Calendar Watcher",
         detail:
           "A Workato recipe polls Salesforce activities every 5 minutes. When a new external meeting is created or updated within the next 24 hours, it fires a downstream workflow with the meeting metadata.",
         tools: ["salesforce", "workato"],
       },
       {
         layer: 2,
-        name: "Deterministic Pre-Processing — Multi-Source Pull",
+        name: "Hydrate — Pull Gong, ZoomInfo, Clay, LinkedIn in Parallel",
         detail:
           "Workato pulls account history from SFDC, last-three-call summaries from Gong, firmographic data via ZoomInfo and Clay (waterfall enrichment), recent LinkedIn activity for the contacts, and any open opportunities. Filters by meeting type (discovery vs expansion vs renewal vs check-in) to scope what gets pulled.",
         tools: ["salesforce", "gong", "zoominfo", "clay", "linkedin", "workato"],
       },
       {
         layer: 3,
-        name: "AI Synthesis — One-Page Brief",
+        name: "Decide — Claude Synthesizes the One-Pager",
         detail:
           "Vercel AI SDK calls Claude Sonnet via the AI Gateway with a structured prompt + the source data. Returns a typed JSON object with the brief sections. Tool-calling is used to fetch additional context only if the model needs it (e.g., 'find more recent news about this firm').",
         tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
       },
       {
         layer: 4,
-        name: "Deterministic Post-Processing — Validate and Format",
+        name: "Validate — Schema Check, Citation Audit, Dedupe",
         detail:
           "TypeScript validation layer checks the JSON against a Zod schema, ensures every claim has a citation, deduplicates against the last brief sent for the same meeting, and renders into both a Markdown email body and a Slack Block Kit message.",
         tools: ["vercel-ai-sdk"],
       },
       {
         layer: 5,
-        name: "Delivery — In Existing Surfaces",
+        name: "Deliver + Record — Slack DM, Email, Snowflake Log",
         detail:
-          "Email goes via Marketo transactional API. Slack DM goes via Slack Workflow. Both fire 30 minutes before meeting start. Rep sees the brief in surfaces they already use. No new tool, no login, no app to install.",
-        tools: ["marketo", "slack"],
+          "Email goes via Marketo transactional API. Slack DM goes via Slack Workflow. Both fire 30 minutes before meeting start. Rep sees the brief in surfaces they already use. Every generation — inputs, model reasoning, delivery receipts, 👍/👎 — logs to Snowflake so the human can trust it.",
+        tools: ["marketo", "slack", "snowflake"],
       },
     ],
     stack: [
@@ -241,6 +258,14 @@ export const TICKETS: Ticket[] = [
     labels: ["prospecting", "intelligence", "firecrawl", "relationship-graph"],
     oneLiner:
       "Build a Firecrawl /agent workflow that extracts every named client company from a law firm's public website. Surfaces the corporate relationships hiding in attorney bios.",
+    topPerformerMove:
+      "Your best researcher already knows where law firm client data hides — practice-group representative experience, attorney bio deal tombstones, news mentions of closed matters. Nobody writes it down. It lives in her muscle memory. The agent doesn't replace her intuition; it encodes the three-surfaces insight into one careful prompt and lets Firecrawl /agent do the legwork at firm-portfolio scale.",
+    roiMath: {
+      cost: "$8K eng + Firecrawl credits (~$300/mo at 500 firms)",
+      savings: "Unlocks 100% of the corporate cross-sell relationship graph Harvey does not have today",
+      multiplier: "Untapped — every Fortune 500 client of a pipeline firm becomes a warm lead",
+      payback: "First closed cross-sell deal sourced from the graph",
+    },
     background: [
       "James asked me directly on April 10: 'Some firms list out what companies they work with. How would you structure the firecrawl query to look to see what customers are listed?' This ticket is the structured answer.",
       "The hard part is not the crawl. It's that law firm websites do not have SaaS-style logo walls. Client data is scattered across three different surfaces, and a naive crawl misses the majority of the value:",
@@ -260,37 +285,37 @@ export const TICKETS: Ticket[] = [
     architecture: [
       {
         layer: 1,
-        name: "Input — Law Firm Domain Queue",
+        name: "Sense — Law Firm Domain Queue",
         detail:
           "Salesforce account list filtered to law firm domains. One firm per workflow execution. Workato recipe pulls the queue daily and fans out to the workflow runtime.",
         tools: ["salesforce", "workato"],
       },
       {
         layer: 2,
-        name: "Deterministic Pre-Processing — URL Discovery",
+        name: "Scope — Sitemap Discovery for Candidate URLs",
         detail:
           "Optional sitemap.xml fetch to identify candidate pages: practice group landing pages, attorney bio pages, news/insights pages. Provides scope hints to /agent so it does not have to crawl blind. Falls back to root domain if no sitemap is exposed.",
         tools: ["firecrawl"],
       },
       {
         layer: 3,
-        name: "AI Generation — Single Firecrawl /agent Call",
+        name: "Decide — Single Firecrawl /agent Call",
         detail:
           "Single call to Firecrawl /agent with the discovered URL set and a tightly scoped prompt: 'Find all explicitly named client companies on [firm domain]. Look in representative experience sections, client lists, attorney bios, and deal tombstones. Only return companies named directly, skip anything described generically like a leading technology company. Include the context of how they were mentioned.' /agent handles JS rendering, pagination, and rate limiting natively. Only the prompt is required; URLs are optional scope hints.",
         tools: ["firecrawl", "vercel-ai-sdk"],
       },
       {
         layer: 4,
-        name: "Deterministic Post-Processing — Validate, Dedupe, Tag",
+        name: "Validate — Dedupe, ICP Tag, Cross-Reference",
         detail:
           "Each extracted company validated against a known company list. Deduped against existing Salesforce accounts. Tagged with source URL, attorney name, work type, and mention context. Cross-referenced against customer base to flag cross-sell signals (existing Harvey customer surfaced as firm's client) and prospecting signals (ICP fit, not yet customer). Residual generic descriptors filtered via deterministic regex on phrasing patterns.",
         tools: ["snowflake", "salesforce"],
       },
       {
         layer: 5,
-        name: "Delivery — Snowflake Write + Slack Signal",
+        name: "Deliver + Record — Snowflake Write, Slack Cross-Sell Signal",
         detail:
-          "Structured client list written to Snowflake firm_client_mapping table for aggregation across the entire firm portfolio. AE who owns the law firm receives a Slack DM: 'Cool & Associates works with 47 named companies. 12 are Harvey ICP fit. 3 are existing Harvey customers — cross-sell opportunity.' High-confidence prospecting signals push to Salesforce as new account candidates with the source firm attached for context.",
+          "Structured client list written to Snowflake firm_client_mapping table for aggregation across the entire firm portfolio. AE who owns the law firm receives a Slack DM: 'Cool & Associates works with 47 named companies. 12 are Harvey ICP fit. 3 are existing Harvey customers — cross-sell opportunity.' High-confidence prospecting signals push to Salesforce as new account candidates with the source firm attached for context. Every extraction and tagging decision logs to Snowflake so AEs can audit how the graph was built.",
         tools: ["snowflake", "salesforce", "slack"],
       },
     ],
@@ -395,6 +420,14 @@ export const TICKETS: Ticket[] = [
     labels: ["lead-routing", "segmentation", "foundation"],
     oneLiner:
       "Auto-classify every inbound lead into the right segment within 5 minutes of arrival, route to the right rep pool, enroll in the right sequence.",
+    topPerformerMove:
+      "Your best AmLaw enterprise rep already knows when a lead is 'corporate legal, not law firm' within 30 seconds of opening it. He pattern-matches on title, firm name, jurisdiction, and prior context — the same four signals every time. The classifier encodes his 30-second decision and runs it on every lead within 5 minutes of arrival, with a written reasoning string so every rep downstream can trust it.",
+    roiMath: {
+      cost: "$25K eng + Claude API (~$1.2K/mo at current lead volume)",
+      savings: "+10pt mid-funnel lift, prevents corporate→AmLaw routing waste that currently leaks deals",
+      multiplier: "Foundational — every downstream workflow gets smarter once segmentation exists",
+      payback: "60 days from production cutover",
+    },
     background: [
       "Harvey now sells to four meaningfully distinct customer segments: AmLaw 100 firms, Fortune 100 corporate legal departments, mid-market firms, and international. Each has fundamentally different procurement, security review processes, sales cycle lengths, buyer personas, and success criteria. Selling to a Fortune 500 General Counsel is not the same job as selling to a managing partner at a global law firm.",
       "Current routing was built when Harvey only sold AmLaw. Every inbound lead enters one pool and gets handled by the next available rep. The result is mid-funnel waste: an AmLaw enterprise rep gets a corporate legal lead, struggles to handle the unfamiliar buyer, and the lead goes cold. The reverse happens too.",
@@ -412,38 +445,38 @@ export const TICKETS: Ticket[] = [
     architecture: [
       {
         layer: 1,
-        name: "Input — Marketo Form Fill or MQL Trigger",
+        name: "Sense — Marketo / Qualified Form Webhook",
         detail:
           "When a lead fills a form on harvey.ai, schedules a demo via Qualified, or crosses an MQL threshold in Marketo, a webhook fires into a Vercel API route. Includes the lead's email, company, role, and any captured form fields.",
         tools: ["marketo", "qualified"],
       },
       {
         layer: 2,
-        name: "Deterministic Enrichment Cascade",
+        name: "Hydrate — Clay → Scalestack → ZoomInfo Waterfall",
         detail:
           "Run a waterfall enrichment: Clay first for fast firmographic data, then Scalestack for international firms (where it is strongest), then ZoomInfo as backup for contact-level detail. Capture firm size, jurisdiction, practice areas, technographic (M365 footprint matters for the Copilot integration), and the contact's exact role.",
         tools: ["clay", "scalestack", "zoominfo"],
       },
       {
         layer: 3,
-        name: "AI Classification — Claude with Tool Calling",
+        name: "Decide — Claude Classifies with Reasoning String",
         detail:
           "Vercel AI SDK calls Claude Sonnet via the AI Gateway. The model receives the enriched lead profile and is asked to classify into one of four segments with a confidence score and a written reasoning string. Tool calling lets the model fetch additional context (recent firm news, jurisdiction-specific signals) if needed before deciding.",
         tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude", "vercel-sandbox"],
       },
       {
         layer: 4,
-        name: "Deterministic Routing Rules",
+        name: "Route — Per-Segment Rules, Confidence Gate",
         detail:
           "Apply per-segment routing rules. AmLaw 100 routes to former-BigLaw enterprise AE pool. Fortune 100 corporate legal routes to corporate sales specialist pool. Mid-market firms route to velocity reps. International routes to regional pool with jurisdiction match. Confidence below 85% routes to human review queue. Dedupe against existing accounts.",
         tools: ["workato", "salesforce"],
       },
       {
         layer: 5,
-        name: "Delivery — SFDC Update + Sequence Enrollment + Slack Notification",
+        name: "Deliver + Record — SFDC Update, Sequence Enrollment, Slack DM",
         detail:
-          "Salesforce Lead record is updated with segment, confidence score, and reasoning. Marketo enrolls the lead into the segment-specific nurture sequence. The owning rep receives a Slack DM with the brief and the reasoning so they trust the classification.",
-        tools: ["salesforce", "marketo", "slack"],
+          "Salesforce Lead record is updated with segment, confidence score, and reasoning. Marketo enrolls the lead into the segment-specific nurture sequence. The owning rep receives a Slack DM with the brief and the reasoning so they trust the classification. Every classification and misclassification flag streams to Snowflake for monthly retune.",
+        tools: ["salesforce", "marketo", "slack", "snowflake"],
       },
     ],
     stack: [
@@ -569,6 +602,14 @@ export const TICKETS: Ticket[] = [
     labels: ["product-led-growth", "expansion", "agent-builder"],
     oneLiner:
       "Daily detection of which existing customers are showing 'ready for Agent Builder' product signals. Routes value hypothesis to the AE.",
+    topPerformerMove:
+      "Your best CSM already knows which customers are Agent Builder ready. Once a week she opens the product analytics tab and scans for workflow count, multi-step complexity, and execution ceilings. Three signals, same order, every time. The agent runs her exact mental checklist daily across the full customer base and routes only the ones that match — plus a written value hypothesis naming the specific workflows that would convert.",
+    roiMath: {
+      cost: "$18K eng + Claude API (~$800/mo)",
+      savings: "Operationalizes Agent Builder expansion motion — turns the biggest 2026 launch into a daily pipeline event",
+      multiplier: "ARR-attributed; tracked with closed-won attribution monthly",
+      payback: "First Agent Builder upsell sourced from a delivered signal",
+    },
     background: [
       "Harvey launched Agent Builder in March 2026. It is the product the company is betting on for the next phase of expansion. The question for sales is no longer 'who should we tell about this' — it is 'which existing customers are sophisticated enough that they will actually adopt and expand?'",
       "Without signal detection, account executives are guessing. They are looking at the customers they already know well and missing the customers whose usage patterns are quietly screaming 'we are ready for Agent Builder.'",
@@ -586,38 +627,38 @@ export const TICKETS: Ticket[] = [
     architecture: [
       {
         layer: 1,
-        name: "Input — Daily Product Analytics Sync",
+        name: "Sense — Daily Product Analytics Pull",
         detail:
           "Fivetran replicates Harvey's product analytics database into Snowflake hourly. The Agent Builder signal job reads from a `product_usage` table that has workflow counts, execution metadata, and active user counts per customer per day.",
         tools: ["fivetran", "snowflake"],
       },
       {
         layer: 2,
-        name: "Deterministic Threshold Filters",
+        name: "Filter — Threshold Query for Candidate Customers",
         detail:
           "Snowflake query filters customers down to those meeting baseline criteria: 10+ custom workflows in Assistant in the last 30 days, at least one multi-step workflow, weekly active users among innovation team users trending up 20%+ over a rolling 4-week window. This shrinks the candidate set from thousands to dozens.",
         tools: ["snowflake"],
       },
       {
         layer: 3,
-        name: "AI Value Hypothesis Generation",
+        name: "Decide — Claude Drafts the Value Hypothesis",
         detail:
           "For each candidate customer, Vercel AI SDK calls Claude Sonnet via the AI Gateway with the customer's specific usage profile and any open opportunities. The model returns a typed JSON object containing: a written value hypothesis, the three specific workflows that would benefit most from Agent Builder, the suggested first conversation framing, and a confidence score.",
         tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
       },
       {
         layer: 4,
-        name: "Deterministic Scoring + Deduplication + Routing",
+        name: "Score — Dedupe, Suppress, Route by Ownership",
         detail:
           "Apply a final scoring rubric. Filter out customers in active procurement, in renewal negotiation, or with an existing Agent Builder opportunity. Dedupe against signals sent in the last 14 days. Route each remaining signal to the account-owning AE based on Salesforce ownership.",
         tools: ["workato", "salesforce"],
       },
       {
         layer: 5,
-        name: "Delivery — Salesforce Task + Catalyst Signal + Slack DM",
+        name: "Deliver + Record — SFDC Task, Catalyst Event, Slack DM",
         detail:
-          "Create a Salesforce task on the account with the value hypothesis as the description. Log the same signal as a Catalyst customer engagement event so CS sees it too. Send the AE a Slack DM with the signal, the hypothesis, and a one-click 'mark actioned/not yet/wrong fit' button.",
-        tools: ["salesforce", "catalyst", "slack"],
+          "Create a Salesforce task on the account with the value hypothesis as the description. Log the same signal as a Catalyst customer engagement event so CS sees it too. Send the AE a Slack DM with the signal, the hypothesis, and a one-click 'mark actioned/not yet/wrong fit' button. Every feedback mark logs back to Snowflake for monthly prompt retune.",
+        tools: ["salesforce", "catalyst", "slack", "snowflake"],
       },
     ],
     stack: [

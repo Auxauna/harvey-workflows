@@ -22,11 +22,11 @@ export function ProjectHeader() {
         </h1>
 
         <p className="mt-5 text-lg text-fg-secondary leading-relaxed max-w-3xl">
-          A working roadmap of the four GTM workflow automations I would prioritize as Harvey&apos;s
-          first GTM Business Analyst hire. Each ticket diagnoses a real bottleneck, scopes the
-          architecture against Harvey&apos;s actual stack, and ships against measurable validation
-          criteria. Decomposed using the same five-layer framework I built into a vertical AI agent
-          for construction spec review and validated across five different trades.
+          A working roadmap of four GTM workflow automations I would prioritize as Harvey&apos;s
+          first GTM Business Analyst hire. Each ticket follows the shape Drew Bredvick built into
+          Vercel&apos;s first GTM agent — shadow the best performer, scope ruthlessly, ship the
+          weekend MVP, measure the ROI. Built on Harvey&apos;s actual GTM stack and the Vercel AI
+          primitives Drew uses internally.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">

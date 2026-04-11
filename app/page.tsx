@@ -31,12 +31,12 @@ export default function Home() {
               How to read this board
             </div>
             <p className="text-sm text-fg-secondary leading-relaxed font-serif">
-              Each ticket is structured as a real Linear-style issue: diagnosed background,
-              acceptance criteria, architecture decomposed into a repeatable five-layer pattern,
-              full stack against Harvey&apos;s actual tools, phased implementation plan, risks
-              with mitigations, and a measurable validation plan. GTM-002 is the structured answer
-              to the Firecrawl question James asked me in our DMs on April 10. The same five-layer
-              framework powers all four tickets — different domain, same architecture.
+              Each ticket is structured as a real Linear-style issue, written in the voice Drew
+              Bredvick uses for Vercel&apos;s GTM agents: shadow the best performer, scope
+              ruthlessly, vibe code the prototype, ship the weekend MVP, measure the ROI. GTM-002
+              is the structured answer to the Firecrawl question James asked me in our DMs on
+              April 10. Every ticket leads with the problem, names the top performer move, and
+              shows the ROI math before the architecture.
             </p>
           </div>
         </div>

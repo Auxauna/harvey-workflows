@@ -4,7 +4,7 @@ import { SectionHeader } from "./background-section";
 export function ValidationPlan({ metrics }: { metrics: ValidationMetric[] }) {
   return (
     <section>
-      <SectionHeader label="Validation Plan" />
+      <SectionHeader label="How We Know It's Working" />
       <div className="space-y-3">
         {metrics.map((m, i) => (
           <div key={i} className="hairline rounded-sm bg-bg-base px-5 py-4">

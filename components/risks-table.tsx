@@ -10,7 +10,7 @@ const LIKELIHOOD_COLOR: Record<Risk["likelihood"], string> = {
 export function RisksTable({ risks }: { risks: Risk[] }) {
   return (
     <section>
-      <SectionHeader label="Risks & Mitigations" />
+      <SectionHeader label="What Could Go Wrong" />
       <div className="hairline rounded-sm overflow-hidden">
         {risks.map((risk, i) => (
           <div

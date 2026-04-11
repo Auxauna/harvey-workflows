@@ -69,18 +69,42 @@ export default async function TicketPage({
         <div className="px-10 py-10">
           <div className="max-w-5xl grid grid-cols-[1fr_240px] gap-10">
             <div className="space-y-12 min-w-0">
-              <BackgroundSection background={ticket.background} />
+              <BackgroundSection background={ticket.background} label="The Problem" />
+
+              {ticket.topPerformerMove && (
+                <section>
+                  <SectionHeader label="The Top Performer Move" />
+                  <div className="hairline rounded-sm bg-bg-subtle px-5 py-4">
+                    <p className="text-[15px] text-fg-primary leading-relaxed font-serif">
+                      {ticket.topPerformerMove}
+                    </p>
+                  </div>
+                </section>
+              )}
+
               <AcceptanceCriteria criteria={ticket.acceptanceCriteria} />
 
               <section>
-                <SectionHeader label="Architecture · Five-Layer Decomposition" />
+                <SectionHeader label="The Agent Build" />
                 <ArchitectureDiagram layers={ticket.architecture} />
               </section>
 
               <section>
-                <SectionHeader label="Full Stack" />
+                <SectionHeader label="Stack" />
                 <StackBadges stack={ticket.stack} />
               </section>
+
+              {ticket.roiMath && (
+                <section>
+                  <SectionHeader label="ROI Math" />
+                  <div className="hairline rounded-sm bg-bg-base grid grid-cols-1 divide-y lg:grid-cols-4 lg:divide-y-0 lg:divide-x divide-[var(--border-hairline)]">
+                    <RoiStat label="Cost" value={ticket.roiMath.cost} />
+                    <RoiStat label="Savings" value={ticket.roiMath.savings} />
+                    <RoiStat label="Multiplier" value={ticket.roiMath.multiplier} />
+                    <RoiStat label="Payback" value={ticket.roiMath.payback} />
+                  </div>
+                </section>
+              )}
 
               <ImplementationPhases phases={ticket.implementation} />
               <RisksTable risks={ticket.risks} />
@@ -109,6 +133,17 @@ export default async function TicketPage({
           </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function RoiStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="px-5 py-4">
+      <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted mb-1.5">
+        {label}
+      </div>
+      <div className="text-[15px] text-fg-primary leading-snug font-serif">{value}</div>
     </div>
   );
 }
