@@ -85,10 +85,10 @@ export default function AboutPage() {
               Jacob Rucker
               <br />
               <a
-                href="mailto:jake@airtightbuilds.com"
+                href="mailto:jacobruckerpersonal@gmail.com"
                 className="text-accent-forest hover:underline"
               >
-                jake@airtightbuilds.com
+                jacobruckerpersonal@gmail.com
               </a>
             </p>
           </div>
