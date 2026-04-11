@@ -72,62 +72,62 @@ export const TICKETS: Ticket[] = [
     oneLiner:
       "Auto-generate a one-page meeting brief 30 minutes before every external meeting and deliver it to the rep's inbox and Slack.",
     topPerformerMove:
-      "Your best AE already builds her own pre-call brief by hand. She has six tabs open: Salesforce, Gong, ZoomInfo, LinkedIn, Clay, last quarter's deal review notes. Thirty minutes of synthesis before every meeting. The agent shadows her exact process — same sources, same priorities, same talking-point hierarchy — and ships the brief to her inbox before she'd have even opened the first tab.",
+      "The best AE already builds her own pre-call brief by hand. Five tabs: Salesforce, Gong, ZoomInfo, Clay, last quarter's deal review notes. Fifteen to twenty minutes of synthesis before every meeting. The agent shadows her exact process — same sources, same priorities, same talking-point hierarchy — and ships the brief to her inbox before she'd have opened the first tab.",
     roiMath: {
-      cost: "$15K eng + ~$2K/mo Claude API",
-      savings: "~$3M/yr in rep prep time across 30 reps × 8 meetings × 30 min",
-      multiplier: "200x first-year return",
-      payback: "4 days after canary pod launch",
+      cost: "$15K eng + ~$2K/mo Claude API + ~$200/mo Resend",
+      savings: "~$600K/yr in recovered rep prep time across ~40 sellers, plus a quality floor on every brief",
+      multiplier: "~15x first-year return, defensible without inflation",
+      payback: "Week 2 after canary pod ships",
     },
     background: [
-      "Reps spend 30 to 45 minutes researching accounts before every external meeting. Pulling from Salesforce for account history, Gong for last-call notes, ZoomInfo and Clay for firmographic detail, and LinkedIn for the contact's recent activity. The data exists. The work of assembling it is the bottleneck.",
-      "Rough math: ~8 external meetings per day per rep × 30 minutes of prep × 30 reps = ~120 hours per day across the sales team spent on research that should be automated. Annualized that is roughly $3M of fully-loaded rep time spent assembling information that already lives in our systems.",
-      "The pain is worse at Harvey specifically because much of the sales team is former BigLaw attorneys, not SaaS-native sellers. They are exceptional in conversation. They are not exceptional at clicking through six tools to assemble a pre-call view. The job of GTM Technology is to make the assembly invisible.",
+      "Sellers spend 15-20 minutes researching accounts before every external meeting. Pulling from Salesforce for account history, Gong for last-call notes, and Clay + ZoomInfo for firmographic and contact detail. The data already exists. The work of assembling it is the bottleneck.",
+      "Rough math: ~40 customer-facing sellers × ~6 external meetings per week × ~20 min prep per meeting × 50 weeks ≈ 4,000 hours per year. Loaded at a conservative $150/hr, that is ~$600K in rep time spent assembling information that already lives in our systems. The time is real; the 200x multipliers in the pitch deck are not.",
+      "The pain is worse at Harvey specifically because much of the sales team is former BigLaw attorneys, not SaaS-native sellers. They are exceptional in the room. They are not exceptional at clicking through five tools to assemble a pre-call view. The job of GTM Technology is to make the assembly invisible.",
       "This is the lowest-friction, highest-visibility win for the function. It earns trust with the rep population in week three so the harder systems work has air cover.",
     ],
     acceptanceCriteria: [
       "A one-page brief auto-generates 30 minutes before every external meeting on a sales rep's calendar.",
-      "The brief is delivered to the rep's inbox via transactional email AND as a Slack DM. The rep does not have to open a new tool.",
+      "The brief is delivered to the rep via Resend transactional email AND a Slack DM through Vercel Chat SDK. The rep does not have to open a new tool.",
       "The brief includes: meeting attendees with role and tenure, last three Gong call summaries with key objections raised, recent firm news from the past 14 days, the AE's open opportunities at the account, and three suggested talking points scoped to the meeting type.",
-      "Every brief includes inline source citations (Salesforce, Gong, ZoomInfo, LinkedIn). No claims without sources.",
-      "The rep can mark the brief 👍 or 👎 with one click. Ratings are logged to Snowflake for continuous improvement.",
-      "If a brief cannot be generated (data missing, edge case), the system fails silently and logs the failure to a Linear issue for triage. It never sends a half-built brief.",
+      "Every claim in the brief has an inline source citation (Salesforce, Gong, ZoomInfo, Clay). Pass^k=1 on citation coverage across the 50-task golden set — no uncited claims ever ship.",
+      "The rep can mark the brief 👍 or 👎 with one click. Ratings log to Snowflake for prompt retuning.",
+      "If a brief cannot be generated (data missing, edge case), the system fails silently and logs to Linear for triage. Half-built briefs never ship.",
     ],
     architecture: [
       {
         layer: 1,
-        name: "Sense — Salesforce Calendar Watcher",
+        name: "Sense — Salesforce Platform Event Subscription",
         detail:
-          "A Workato recipe polls Salesforce activities every 5 minutes. When a new external meeting is created or updated within the next 24 hours, it fires a downstream workflow with the meeting metadata.",
+          "A Workato recipe subscribes to Salesforce Platform Events on Activity. When a new external meeting is created or updated within the next 24 hours, the recipe fires immediately and passes meeting metadata downstream. No polling tax, no 5-minute jitter on the 30-minute SLA.",
         tools: ["salesforce", "workato"],
       },
       {
         layer: 2,
-        name: "Hydrate — Pull Gong, ZoomInfo, Clay, LinkedIn in Parallel",
+        name: "Hydrate — Pull Gong, ZoomInfo, Clay in Parallel",
         detail:
-          "Workato pulls account history from SFDC, last-three-call summaries from Gong, firmographic data via ZoomInfo and Clay (waterfall enrichment), recent LinkedIn activity for the contacts, and any open opportunities. Filters by meeting type (discovery vs expansion vs renewal vs check-in) to scope what gets pulled.",
-        tools: ["salesforce", "gong", "zoominfo", "clay", "linkedin", "workato"],
+          "Workato pulls account history from SFDC, last-three-call summaries from Gong, and firmographic + contact detail via a ZoomInfo → Clay waterfall (Clay also surfaces LinkedIn-derived signal like recent posts and job changes, which we pick up through Clay rather than direct LinkedIn API since Sales Navigator API is closed to new partners). Filters by meeting type (discovery / expansion / renewal / check-in) to scope what gets pulled.",
+        tools: ["salesforce", "gong", "zoominfo", "clay", "workato"],
       },
       {
         layer: 3,
         name: "Decide — Claude Synthesizes the One-Pager",
         detail:
-          "Vercel AI SDK calls Claude Sonnet via the AI Gateway with a structured prompt + the source data. Returns a typed JSON object with the brief sections. Tool-calling is used to fetch additional context only if the model needs it (e.g., 'find more recent news about this firm').",
+          "Vercel AI SDK v6 calls Claude Sonnet via the AI Gateway with a structured prompt and the source data. Returns a typed object validated against a Zod schema. Tool-calling fetches additional context only when needed (e.g., 'find more recent news about this firm').",
         tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
       },
       {
         layer: 4,
-        name: "Validate — Schema Check, Citation Audit, Dedupe",
+        name: "Validate — Schema, Citation Audit, Dedupe",
         detail:
-          "TypeScript validation layer checks the JSON against a Zod schema, ensures every claim has a citation, deduplicates against the last brief sent for the same meeting, and renders into both a Markdown email body and a Slack Block Kit message.",
+          "TypeScript validation layer checks the output against the Zod schema, ensures every claim has a citation back to a source row, deduplicates against the last brief sent for the same meeting, and renders into both a React Email template (for Resend) and a Slack Block Kit message (for Vercel Chat SDK).",
         tools: ["vercel-ai-sdk"],
       },
       {
         layer: 5,
-        name: "Deliver + Record — Slack DM, Email, Snowflake Log",
+        name: "Deliver + Record — Resend Email, Slack DM, Snowflake Log",
         detail:
-          "Email goes via Marketo transactional API. Slack DM goes via Slack Workflow. Both fire 30 minutes before meeting start. Rep sees the brief in surfaces they already use. Every generation — inputs, model reasoning, delivery receipts, 👍/👎 — logs to Snowflake so the human can trust it.",
-        tools: ["marketo", "slack", "snowflake"],
+          "Email ships via Resend transactional API (Vercel-native SDK, React Email templates). Slack DM ships via Vercel Chat SDK. Both fire 30 minutes before meeting start so the rep sees the brief in surfaces they already use. Every generation — inputs, model reasoning, delivery receipts, 👍/👎 — streams to Snowflake as the canonical audit trail and prompt-retune source.",
+        tools: ["resend", "slack", "vercel-chat-sdk", "snowflake"],
       },
     ],
     stack: [
@@ -135,58 +135,55 @@ export const TICKETS: Ticket[] = [
       "gong",
       "zoominfo",
       "clay",
-      "linkedin",
       "workato",
       "vercel-ai-sdk",
       "vercel-ai-gateway",
       "claude",
       "snowflake",
-      "marketo",
+      "resend",
+      "vercel-chat-sdk",
       "slack",
     ],
     implementation: [
       {
         phase: 1,
         weekRange: "Week 1",
-        title: "Build the data pull layer",
+        title: "Gold set and data pull",
         tasks: [
+          "Shadow three top AEs for half a day. Watch them build briefs by hand. Time each step.",
+          "Collect 50 hand-written briefs from the top three AEs. This is the golden set — the eval target.",
           "Define the Zod schema for a brief (sections, fields, citation format).",
-          "Build the Workato recipe that polls SFDC for upcoming meetings.",
-          "Wire up data fetchers for Gong, ZoomInfo, Clay, and LinkedIn against five sample meetings.",
-          "Validate that the right data flows through end-to-end before AI is in the loop.",
+          "Build the Workato recipe subscribing to SFDC Platform Events. Wire up parallel fetchers for Gong, ZoomInfo, and Clay against five sample meetings. Validate end-to-end data flow before AI is in the loop.",
         ],
       },
       {
         phase: 2,
         weekRange: "Week 2",
-        title: "Add the AI synthesis layer with three alpha testers",
+        title: "AI synthesis with pass^k=1 citation coverage",
         tasks: [
-          "Build the Vercel AI SDK route that calls Claude Sonnet via AI Gateway.",
-          "Iterate on the system prompt with three rep volunteers as alpha testers.",
-          "Validate citation accuracy and brief quality against ground truth.",
-          "Lock the brief template that everyone gets.",
+          "Build the AI SDK route that calls Claude Sonnet via AI Gateway.",
+          "Iterate on the system prompt until pass^k=1 on citation coverage across the 50-task golden set (every claim traceable to a source row).",
+          "Grader agreement >80% on brief quality vs the top-AE hand-written versions.",
+          "Lock the brief template. Ship React Email template for Resend and Block Kit message for Vercel Chat SDK.",
         ],
       },
       {
         phase: 3,
         weekRange: "Week 3",
-        title: "Production rollout to one pod",
+        title: "Canary pod rollout",
         tasks: [
           "Deploy to one of Rob's enterprise pods as the canary group.",
-          "Wire up Slack delivery and Marketo transactional email.",
-          "Monitor brief generation rate, open rate, and 👍/👎 feedback for 5 business days.",
-          "Triage any failures via Linear.",
+          "Run in shadow mode for 48 hours (generate but don't send). Manual review on every brief.",
+          "Flip to live delivery. Monitor generation rate, open rate, and 👍/👎 feedback for 5 business days. Triage failures via Linear.",
         ],
       },
       {
         phase: 4,
         weekRange: "Week 4",
-        title: "Expand to the full sales team",
+        title: "Full rollout",
         tasks: [
-          "Address any feedback from canary pod.",
-          "Roll out to the rest of the team.",
-          "Document the runbook in Notion.",
-          "Hand the recipe ownership over to RevOps for ongoing tuning.",
+          "Address canary feedback. Roll out to the rest of the team.",
+          "Document the runbook in Notion. Hand recipe ownership to RevOps for ongoing tuning.",
         ],
       },
     ],
@@ -218,29 +215,24 @@ export const TICKETS: Ticket[] = [
     ],
     validation: [
       {
-        metric: "Brief generation rate",
-        target: "95% of qualifying meetings",
-        why: "Coverage is the floor. If we miss 1 in 20, reps stop trusting it.",
+        metric: "Citation coverage on golden set",
+        target: "pass^k=1 — every claim traceable",
+        why: "Zero-tolerance floor. A brief with one uncited claim is a brief a rep can't trust, and trust is the product.",
       },
       {
-        metric: "Brief open rate",
-        target: "80% within 30 minutes of delivery",
-        why: "Tells us reps are actually finding value in the surface where we put it.",
+        metric: "Brief generation rate",
+        target: "≥95% of qualifying meetings",
+        why: "Coverage floor. Miss 1 in 20 and reps stop trusting the surface.",
       },
       {
         metric: "👍 satisfaction rate",
-        target: "70% of rated briefs",
-        why: "Quality signal. Below 70% means the prompt or data needs work.",
+        target: "≥70% of rated briefs",
+        why: "Quality signal from the people using it. Below 70% means the prompt or data needs work.",
       },
       {
         metric: "Self-reported time saved per meeting",
-        target: "20 minutes average",
-        why: "The whole reason we built this. Validates the ROI math.",
-      },
-      {
-        metric: "Deal advancement lift",
-        target: "+5pt versus pre-launch baseline",
-        why: "Lagging indicator. Proves better prep leads to better meetings.",
+        target: "10–15 minutes average",
+        why: "The number the ROI math depends on. Self-reported is enough — we're not optimizing it, we're verifying it exists.",
       },
     ],
     whyThisMatters:
@@ -275,12 +267,13 @@ export const TICKETS: Ticket[] = [
       "Once extracted at scale, this dataset is rocket fuel for Harvey GTM. Every Fortune 500 corporate that a Harvey-prospect law firm works with becomes a warm lead for Harvey's corporate legal motion. The relationship graph compounds in both directions: firms working with Harvey's existing corporate customers are themselves warm leads. Firmographic ABM gets replaced by relationship ABM.",
     ],
     acceptanceCriteria: [
-      "For any law firm domain in our pipeline or customer base, run a single Firecrawl /agent call that returns every explicitly named client company.",
+      "For any law firm domain in our pipeline or customer base, a single Firecrawl /agent call returns every explicitly named client company.",
       "The agent prompt accounts for all three data surfaces (representative experience, client lists, attorney bios) so we do not miss the majority of value buried in attorney pages.",
-      "Generic placeholders ('a leading technology company', 'a Fortune 500 financial services firm') are filtered out. Only return companies named directly.",
+      "Generic placeholders ('a leading technology company', 'a Fortune 500 financial services firm') are filtered out. Only companies named directly are returned.",
       "Each match includes context: which page it came from, which attorney mentioned it, what type of work was performed.",
-      "Output is structured JSON written to Snowflake under firm_client_mapping with one row per (firm, client) pair.",
-      "Cross-reference each extracted client against existing Salesforce accounts: tag matches as cross-sell signals (firm's client is already a Harvey customer) or prospecting signals (firm's client is in Harvey ICP but not yet a customer).",
+      "Entity resolution runs every extraction through Clay's company-match before any Snowflake write — 'Morgan Stanley' vs 'Morgan Stanley & Co.' vs 'MS Wealth Management' collapse to one canonical account.",
+      "Extraction precision ≥90% on the 15-firm gold set (see Phase 0) before production writes to Snowflake are enabled.",
+      "Cross-referenced against existing Salesforce accounts: tagged as cross-sell signal (firm's client is already a Harvey customer) or prospecting signal (firm's client is in Harvey ICP but not yet a customer).",
     ],
     architecture: [
       {
@@ -301,15 +294,15 @@ export const TICKETS: Ticket[] = [
         layer: 3,
         name: "Decide — Single Firecrawl /agent Call",
         detail:
-          "Single call to Firecrawl /agent with the discovered URL set and a tightly scoped prompt: 'Find all explicitly named client companies on [firm domain]. Look in representative experience sections, client lists, attorney bios, and deal tombstones. Only return companies named directly, skip anything described generically like a leading technology company. Include the context of how they were mentioned.' /agent handles JS rendering, pagination, and rate limiting natively. Only the prompt is required; URLs are optional scope hints.",
+          "One call to Firecrawl /agent (the natural-language agent endpoint launched February 2026) with the discovered URL set and a tightly scoped prompt: 'Find all explicitly named client companies on [firm domain]. Look in representative experience sections, client lists, attorney bios, and deal tombstones. Only return companies named directly, skip generic descriptions like a leading technology company. Include the context of how they were mentioned.' /agent handles JS rendering, pagination, and rate limiting natively via its Spark 1 models. Only the prompt is required; URLs are optional scope hints.",
         tools: ["firecrawl", "vercel-ai-sdk"],
       },
       {
         layer: 4,
-        name: "Validate — Dedupe, ICP Tag, Cross-Reference",
+        name: "Validate — Entity Resolution, Dedupe, Cross-Reference",
         detail:
-          "Each extracted company validated against a known company list. Deduped against existing Salesforce accounts. Tagged with source URL, attorney name, work type, and mention context. Cross-referenced against customer base to flag cross-sell signals (existing Harvey customer surfaced as firm's client) and prospecting signals (ICP fit, not yet customer). Residual generic descriptors filtered via deterministic regex on phrasing patterns.",
-        tools: ["snowflake", "salesforce"],
+          "Each extracted company runs through Clay's company-match for entity resolution — 'Morgan Stanley,' 'Morgan Stanley & Co.,' and 'MS Wealth Management' collapse to one canonical account. Then deduped against existing Salesforce accounts, tagged with source URL, attorney name, work type, and mention context. Cross-referenced against the customer base to flag cross-sell signals (existing Harvey customer surfaced as firm's client) or prospecting signals (ICP fit, not yet customer). Residual generic descriptors filtered via a deterministic regex on phrasing patterns.",
+        tools: ["clay", "snowflake", "salesforce"],
       },
       {
         layer: 5,
@@ -322,33 +315,46 @@ export const TICKETS: Ticket[] = [
     stack: [
       "salesforce",
       "firecrawl",
+      "clay",
       "vercel-ai-sdk",
       "vercel-workflows",
       "workato",
       "snowflake",
+      "vercel-chat-sdk",
       "slack",
     ],
     implementation: [
       {
+        phase: 0,
+        weekRange: "Week 0",
+        title: "Build the gold set (manual)",
+        tasks: [
+          "Pick 15 law firms as the eval set: 10 AmLaw 100, 3 international (Magic Circle / EU), 2 boutique.",
+          "Hand-build the canonical firm→client mapping for each. This is the extraction oracle — everything downstream measures against this.",
+          "Label each mention with its source surface (representative experience / client list / attorney bio) so we can measure surface-level precision separately.",
+          "Stash the gold set in Snowflake `gtm_tech_evals.firm_client_gold` with a schema that mirrors the production `firm_client_mapping` table.",
+        ],
+      },
+      {
         phase: 1,
         weekRange: "Week 1",
-        title: "Validate the prompt against five known firms",
+        title: "Extraction prompt + post-processing",
         tasks: [
-          "Pick five law firms with publicly known client lists as the validation set. Two AmLaw 100, two mid-market, one boutique.",
-          "Run /agent against each with the initial prompt. Score extraction quality manually against ground truth.",
-          "Iterate the prompt until accuracy is above 90% on all three data surfaces (representative experience, client lists, attorney bios).",
-          "Build the post-processing layer: dedupe, ICP scoring, cross-reference against Salesforce accounts.",
+          "Run /agent against the 15 gold-set firms. Score each extraction against the oracle.",
+          "Iterate the prompt until precision ≥90% across all three data surfaces and recall ≥80% on attorney-bio mentions (the hardest surface).",
+          "Wire entity resolution through Clay's company-match. Wire cross-reference against Salesforce accounts.",
+          "Write the failing-gracefully path: if /agent returns fewer than 5 matches on an AmLaw 100 firm, flag for human review rather than writing empty results.",
         ],
       },
       {
         phase: 2,
         weekRange: "Week 2",
-        title: "Wire scheduled execution and Slack delivery",
+        title: "Scheduled execution and Slack delivery",
         tasks: [
           "Wrap the /agent call + post-processing in a Vercel Workflows scheduled job that runs nightly across the firm pipeline.",
-          "Build the Slack notification template with the cross-sell and prospecting signal counts per firm.",
-          "Roll out to one AE pod as canary. Monitor false positive rate, AE engagement, and surfaced cross-sell signal volume for five business days.",
-          "Document the runbook in Notion. Hand ongoing tuning to RevOps.",
+          "Build the Slack notification via Vercel Chat SDK with cross-sell and prospecting signal counts per firm.",
+          "Shadow mode for 48 hours (generate but don't write to production tables). Manual review on every output.",
+          "Flip to live writes. Roll out to one AE pod as canary. Monitor false positive rate, AE engagement, and surfaced cross-sell volume for five business days. Document the runbook in Notion.",
         ],
       },
     ],
@@ -376,6 +382,12 @@ export const TICKETS: Ticket[] = [
         likelihood: "Medium",
         mitigation:
           "Pre-scope the URL set via sitemap fetch before /agent runs. Pass the scoped URLs as the optional URLs parameter so /agent does not crawl blind across the entire site.",
+      },
+      {
+        risk: "Firecrawl /agent bills on failure and has no published max-pages-per-call, so a runaway extraction can burn credits without returning usable output.",
+        likelihood: "Medium",
+        mitigation:
+          "Credit budget cap enforced per-firm via Vercel Workflows step-level timeout and a pre-call credit reservation check. Any extraction that exceeds the cap or times out fails loud, logs the spend, and flags the firm for manual review rather than silently retrying.",
       },
     ],
     validation: [
@@ -419,27 +431,27 @@ export const TICKETS: Ticket[] = [
     reporter: "Rob Saliterman, VP Sales",
     labels: ["lead-routing", "segmentation", "foundation"],
     oneLiner:
-      "Auto-classify every inbound lead into the right segment within 5 minutes of arrival, route to the right rep pool, enroll in the right sequence.",
+      "Auto-classify every inbound lead into the right Harvey segment within 5 minutes of arrival, route to the right rep pool, enroll in the right sequence.",
     topPerformerMove:
-      "Your best AmLaw enterprise rep already knows when a lead is 'corporate legal, not law firm' within 30 seconds of opening it. He pattern-matches on title, firm name, jurisdiction, and prior context — the same four signals every time. The classifier encodes his 30-second decision and runs it on every lead within 5 minutes of arrival, with a written reasoning string so every rep downstream can trust it.",
+      "The best AmLaw enterprise rep knows when a lead is 'corporate legal, not law firm' within 30 seconds of opening it. He pattern-matches on title, firm domain, jurisdiction, and prior context — the same four signals every time. The classifier encodes his 30-second decision and runs it on every lead within 5 minutes of arrival, with a written reasoning string so every rep downstream can trust it.",
     roiMath: {
-      cost: "$25K eng + Claude API (~$1.2K/mo at current lead volume)",
-      savings: "+10pt mid-funnel lift, prevents corporate→AmLaw routing waste that currently leaks deals",
+      cost: "$25K eng + ~$1.2K/mo Claude API at current lead volume",
+      savings: "Prevents corporate→AmLaw and international→US misroute waste that currently stalls deals mid-funnel",
       multiplier: "Foundational — every downstream workflow gets smarter once segmentation exists",
       payback: "60 days from production cutover",
     },
     background: [
-      "Harvey now sells to four meaningfully distinct customer segments: AmLaw 100 firms, Fortune 100 corporate legal departments, mid-market firms, and international. Each has fundamentally different procurement, security review processes, sales cycle lengths, buyer personas, and success criteria. Selling to a Fortune 500 General Counsel is not the same job as selling to a managing partner at a global law firm.",
-      "Current routing was built when Harvey only sold AmLaw. Every inbound lead enters one pool and gets handled by the next available rep. The result is mid-funnel waste: an AmLaw enterprise rep gets a corporate legal lead, struggles to handle the unfamiliar buyer, and the lead goes cold. The reverse happens too.",
+      "Harvey sells to four publicly distinct customer segments: AmLaw 100 law firms, international law firms (Magic Circle, EU, APAC, LatAm), Fortune 500 corporate legal departments, and asset managers (PE, hedge funds, family offices — 50+ already on the platform). Each has fundamentally different procurement, security review processes, sales cycle lengths, buying committees, and success criteria. Selling to a Bridgewater GC is not the same job as selling to a Magic Circle managing partner.",
+      "Current routing was built when Harvey only sold AmLaw. Every inbound lead enters one pool and gets handled by the next available rep. The result is mid-funnel waste: an AmLaw enterprise rep gets a corporate legal lead, struggles with an unfamiliar buyer, and the lead goes cold. The reverse happens too. An asset manager lead lands with a Magic Circle international rep who is optimizing for a totally different buying committee.",
       "This is the load-bearing system. Once leads are properly segmented at the front door, every downstream system gets smarter. Lead scoring becomes per-segment. Sequences become per-segment. Pre-call briefs become per-segment. Pipeline reporting becomes per-segment. The whole GTM motion gains a dimension it does not currently have.",
-      "Winston said publicly on the Sequoia podcast that 'the machinery is still not there.' This is the part of the machinery that is most clearly missing.",
+      "Winston has said publicly that 'the machinery is still not there.' This is the part of the machinery that is most clearly missing.",
     ],
     acceptanceCriteria: [
-      "Every inbound lead is auto-classified into one of four segments within 5 minutes of entering Marketo.",
+      "Every inbound lead is auto-classified into one of four segments (AmLaw 100 / International law / Corporate legal / Asset manager) within 5 minutes of entering Marketo.",
       "Each classification includes a confidence score and a written reasoning string, both stored on the SFDC Lead record.",
       "Leads with confidence above 85% route automatically. Leads below 85% route to a human review queue.",
       "Each segment has its own rep pool, its own Marketo nurture sequence, and its own first-touch SLA.",
-      "Reps can flag a misclassification with one click in Salesforce. Flags create a Linear issue tagged with the segment and reasoning, and feed back into prompt tuning.",
+      "Reps can flag a misclassification with one click in Salesforce. Flags create a Linear issue tagged with the segment and reasoning, and feed back into the prompt-retune job.",
       "Misclassification rate stays below 5% in production after the first month.",
     ],
     architecture: [
@@ -452,23 +464,23 @@ export const TICKETS: Ticket[] = [
       },
       {
         layer: 2,
-        name: "Hydrate — Clay → Scalestack → ZoomInfo Waterfall",
+        name: "Hydrate — ZoomInfo Primary, Clay on Miss",
         detail:
-          "Run a waterfall enrichment: Clay first for fast firmographic data, then Scalestack for international firms (where it is strongest), then ZoomInfo as backup for contact-level detail. Capture firm size, jurisdiction, practice areas, technographic (M365 footprint matters for the Copilot integration), and the contact's exact role.",
-        tools: ["clay", "scalestack", "zoominfo"],
+          "ZoomInfo's Enrich API is the primary firmographic and contact source. On miss (international firms where ZoomInfo is weak, newer AmLaw corporate clients), fall back to Clay's waterfall enrichment which layers 50+ providers natively. One primary, one fallback — no three-vendor kitchen sink. Capture firm size, jurisdiction, practice areas, technographic (M365 footprint matters for the Copilot integration), and the contact's exact role.",
+        tools: ["zoominfo", "clay"],
       },
       {
         layer: 3,
         name: "Decide — Claude Classifies with Reasoning String",
         detail:
-          "Vercel AI SDK calls Claude Sonnet via the AI Gateway. The model receives the enriched lead profile and is asked to classify into one of four segments with a confidence score and a written reasoning string. Tool calling lets the model fetch additional context (recent firm news, jurisdiction-specific signals) if needed before deciding.",
-        tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude", "vercel-sandbox"],
+          "Vercel AI SDK v6 calls Claude Sonnet via the AI Gateway. The model receives the enriched lead profile and classifies into one of four segments with a confidence score and a written reasoning string the rep will actually read. Tool calling fetches additional context (recent firm news, jurisdiction-specific signals) only when the base inputs are insufficient.",
+        tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
       },
       {
         layer: 4,
         name: "Route — Per-Segment Rules, Confidence Gate",
         detail:
-          "Apply per-segment routing rules. AmLaw 100 routes to former-BigLaw enterprise AE pool. Fortune 100 corporate legal routes to corporate sales specialist pool. Mid-market firms route to velocity reps. International routes to regional pool with jurisdiction match. Confidence below 85% routes to human review queue. Dedupe against existing accounts.",
+          "Apply per-segment routing rules. AmLaw 100 routes to former-BigLaw enterprise AE pool. Corporate legal routes to the corporate sales specialist pool. International routes to the regional pool with jurisdiction match. Asset managers route to the asset manager specialist pool (PE / hedge fund / family office buyers). Confidence below 85% routes to human review queue. Dedupe against existing accounts.",
         tools: ["workato", "salesforce"],
       },
       {
@@ -482,16 +494,15 @@ export const TICKETS: Ticket[] = [
     stack: [
       "marketo",
       "qualified",
-      "clay",
-      "scalestack",
       "zoominfo",
+      "clay",
       "vercel-ai-sdk",
       "vercel-ai-gateway",
       "claude",
-      "vercel-sandbox",
       "workato",
       "salesforce",
       "snowflake",
+      "vercel-chat-sdk",
       "slack",
     ],
     implementation: [
@@ -500,42 +511,40 @@ export const TICKETS: Ticket[] = [
         weekRange: "Week 1",
         title: "Define segment criteria with sales leadership",
         tasks: [
-          "Workshop with Rob, sales leadership, and the four segment owners to define exact criteria per segment.",
-          "Document edge cases (corporate legal departments that are also law firms, regional offices of global firms, etc.).",
+          "Workshop with Rob and the four segment owners to define exact criteria per segment. Lock edge cases (corporate legal departments that also operate in-house law firms, regional offices of global firms, asset managers that also have a law firm arm).",
+          "Pull 500 historical leads from Salesforce with known segment outcomes. This is the backtest set.",
           "Lock the rubric. Get sign-off in writing.",
         ],
       },
       {
         phase: 2,
         weekRange: "Week 2",
-        title: "Build the enrichment cascade and backtest",
+        title: "Build the ZoomInfo → Clay enrichment path",
         tasks: [
-          "Build the waterfall enrichment workflow in Workato.",
-          "Pull 200 historical leads with known segment outcomes from Salesforce.",
-          "Run them through the enrichment cascade. Validate completeness.",
-          "Identify any data gaps that would block classification.",
+          "Build the ZoomInfo primary + Clay fallback enrichment in Workato. Explicit stop-on-hit rule so we never pay both vendors for the same lead.",
+          "Run all 500 historical leads through the enrichment path. Validate completeness (≥95% of leads get enough data to classify).",
+          "Identify any data gaps that would block classification and route those to human review explicitly.",
         ],
       },
       {
         phase: 3,
         weekRange: "Week 3",
-        title: "Wire up Claude classification + validate against backtest",
+        title: "Claude classification + confusion matrix backtest",
         tasks: [
-          "Build the Vercel AI SDK route with Claude classification.",
-          "Run the classifier against the 200 historical leads.",
-          "Compare to the known segment outcomes.",
-          "Iterate on the prompt until accuracy is above 90% on the backtest.",
+          "Build the AI SDK route with Claude classification.",
+          "Run the classifier against the 500-lead backtest set. Build the confusion matrix.",
+          "Target ≥85% precision on AmLaw 100 and corporate legal (the high-value classes), ≥80% on asset managers and international.",
+          "Iterate the prompt until the matrix hits targets. Every misclassification is a training example for the retune job.",
         ],
       },
       {
         phase: 4,
         weekRange: "Week 4",
-        title: "Production rollout with human review fallback",
+        title: "Shadow mode → canary → production",
         tasks: [
-          "Wire up routing rules in Workato + Salesforce flows.",
-          "Build the human review queue for low-confidence leads.",
-          "Set up the Slack notification flow.",
-          "Roll out to production. Monitor misclassification rate daily for 5 business days.",
+          "Wire routing rules in Workato + Salesforce flows. Build the human review queue for low-confidence leads.",
+          "Run in shadow mode for 5 business days (classify but don't route). Daily confusion matrix review with Rob.",
+          "Flip to canary pod. Monitor misclassification rate daily. Full rollout once the first week holds below 5%.",
         ],
       },
     ],
@@ -559,32 +568,32 @@ export const TICKETS: Ticket[] = [
           "The reasoning string is always written to the Salesforce Lead record. Reps see exactly why the model classified the way it did, with the data points cited. Trust comes from transparency.",
       },
       {
-        risk: "Enrichment data is missing for international firms in jurisdictions where Clay and ZoomInfo are weak.",
+        risk: "Enrichment data is missing for international firms where ZoomInfo and Clay are both weak (APAC and LatAm regional firms, smaller EU boutiques).",
         likelihood: "Medium",
         mitigation:
-          "Scalestack is in the cascade specifically for international coverage. If all three vendors fail to find data, the lead routes to the international human review queue with a note explaining why.",
+          "If both the primary and fallback vendor miss, the lead routes to the international human review queue with a note explaining the data gap. Scalestack stays on the bench as a third fallback if the gap becomes systemic, but we don't pay for all three by default.",
       },
     ],
     validation: [
       {
-        metric: "Classification accuracy on backtest",
-        target: "≥90% agreement with known historical outcomes",
-        why: "Floor for production rollout. Cannot launch below this.",
+        metric: "Confusion matrix precision on 500-lead backtest",
+        target: "≥85% on AmLaw 100 and corporate legal, ≥80% on asset managers and international",
+        why: "Hard floor for production. The high-value classes must be strong before we trust the router with real pipeline.",
       },
       {
         metric: "Production misclassification rate",
         target: "<5% within 30 days of launch",
-        why: "Real-world signal. If it drifts above, we retune the prompt and revalidate.",
+        why: "Real-world signal. Drift above this triggers a prompt retune from the misclassification log.",
       },
       {
         metric: "Time-to-first-touch by segment",
         target: "All four segments within their defined SLA",
-        why: "Proves the routing rules and rep pools are working in concert.",
+        why: "Proves the routing rules and rep pools are working in concert with the classifier.",
       },
       {
         metric: "Mid-funnel conversion lift",
-        target: "+10pt lead-to-meeting rate vs. pre-launch baseline",
-        why: "The reason this exists. If conversion does not move, the segmentation isn't worth it.",
+        target: "+5pt to +10pt lead-to-meeting rate vs. pre-launch baseline",
+        why: "The reason this exists. If conversion doesn't move, segmentation isn't worth it and we should ask why.",
       },
     ],
     whyThisMatters:
@@ -603,18 +612,18 @@ export const TICKETS: Ticket[] = [
     oneLiner:
       "Daily detection of which existing customers are showing 'ready for Agent Builder' product signals. Routes value hypothesis to the AE.",
     topPerformerMove:
-      "Your best CSM already knows which customers are Agent Builder ready. Once a week she opens the product analytics tab and scans for workflow count, multi-step complexity, and execution ceilings. Three signals, same order, every time. The agent runs her exact mental checklist daily across the full customer base and routes only the ones that match — plus a written value hypothesis naming the specific workflows that would convert.",
+      "The best CSM already knows which customers are Agent Builder ready. Once a week she opens the product analytics tab and scans for three signals in the same order: (1) custom workflow count in Assistant crossing a threshold, (2) multi-step flows hitting the execution ceiling, (3) weekly active users on the customer's innovation team trending up. The agent runs her exact mental checklist daily across the full customer base and routes only the matches — plus a written value hypothesis naming the specific workflows that would convert.",
     roiMath: {
-      cost: "$18K eng + Claude API (~$800/mo)",
-      savings: "Operationalizes Agent Builder expansion motion — turns the biggest 2026 launch into a daily pipeline event",
-      multiplier: "ARR-attributed; tracked with closed-won attribution monthly",
+      cost: "~$18K eng + ~$800/mo Claude API",
+      savings: "Operationalizes Agent Builder expansion — turns the March 9, 2026 launch into a daily pipeline event rather than a one-time announcement",
+      multiplier: "ARR-attributed, tracked with closed-won attribution monthly",
       payback: "First Agent Builder upsell sourced from a delivered signal",
     },
     background: [
-      "Harvey launched Agent Builder in March 2026. It is the product the company is betting on for the next phase of expansion. The question for sales is no longer 'who should we tell about this' — it is 'which existing customers are sophisticated enough that they will actually adopt and expand?'",
+      "Harvey launched Agent Builder on March 9, 2026. It is the product the company is betting on for the next phase of expansion. The question for sales is no longer 'who should we tell about this' — it is 'which existing customers are sophisticated enough that they will actually adopt and expand?'",
       "Without signal detection, account executives are guessing. They are looking at the customers they already know well and missing the customers whose usage patterns are quietly screaming 'we are ready for Agent Builder.'",
       "The signals are in the product analytics. A customer with 10+ custom workflows in Assistant, multi-step flows hitting execution limits, and increasing weekly active users among their innovation team is the textbook profile. We have the data. We do not have the system that turns the data into a sales action.",
-      "This is product-led growth signal detection applied to a top-down enterprise sales motion. The opportunity: turn Harvey's biggest 2026 product launch into a measurable pipeline event automatically, every day.",
+      "This is product-led growth signal detection applied to a top-down enterprise sales motion. It plugs directly into the public strategic question Gabe Pereyra has been asking: 'If every law firm buys Harvey, how do we differentiate?' The company's answer is Memory, Workflow Agents, and Agent Builder — depth and customization per firm. This workflow is how that answer gets operationalized at the GTM layer. Turn the biggest 2026 product launch into a daily pipeline event rather than a one-time announcement.",
     ],
     acceptanceCriteria: [
       "A scheduled job runs daily at 6am Pacific. Pulls the latest product analytics from Snowflake.",
@@ -634,9 +643,9 @@ export const TICKETS: Ticket[] = [
       },
       {
         layer: 2,
-        name: "Filter — Threshold Query for Candidate Customers",
+        name: "Filter — The Three Signals the Top CSM Scans For",
         detail:
-          "Snowflake query filters customers down to those meeting baseline criteria: 10+ custom workflows in Assistant in the last 30 days, at least one multi-step workflow, weekly active users among innovation team users trending up 20%+ over a rolling 4-week window. This shrinks the candidate set from thousands to dozens.",
+          "Snowflake query filters customers down to those hitting all three signals the best CSM watches for every week: (1) 10+ custom workflows created in Assistant in the last 30 days, (2) at least one multi-step workflow hitting the Assistant execution ceiling, (3) weekly active users among innovation-team users trending up 20%+ over a rolling 4-week window. The exact thresholds are set by shadowing the CSM before launch — not invented. This shrinks the candidate set from thousands to dozens.",
         tools: ["snowflake"],
       },
       {
@@ -655,10 +664,10 @@ export const TICKETS: Ticket[] = [
       },
       {
         layer: 5,
-        name: "Deliver + Record — SFDC Task, Catalyst Event, Slack DM",
+        name: "Deliver + Record — SFDC Task, Catalyst Event, Slack HITL",
         detail:
-          "Create a Salesforce task on the account with the value hypothesis as the description. Log the same signal as a Catalyst customer engagement event so CS sees it too. Send the AE a Slack DM with the signal, the hypothesis, and a one-click 'mark actioned/not yet/wrong fit' button. Every feedback mark logs back to Snowflake for monthly prompt retune.",
-        tools: ["salesforce", "catalyst", "slack", "snowflake"],
+          "Create a Salesforce task on the account with the value hypothesis as the description. Log the same signal as a Catalyst (Totango) customer engagement event so CS sees it alongside their own account notes. Send the AE a Slack DM via Vercel Chat SDK with the signal, the hypothesis, and three one-click buttons: 'actioned,' 'not yet,' or 'wrong fit.' Every button press streams to `upsell_signal_feedback` in Snowflake. A weekly retune job reads the feedback table and adjusts the filter thresholds and prompt wording — the feedback loop is closed, not decorative.",
+        tools: ["salesforce", "catalyst", "vercel-chat-sdk", "slack", "snowflake"],
       },
     ],
     stack: [
@@ -671,6 +680,7 @@ export const TICKETS: Ticket[] = [
       "vercel-workflows",
       "salesforce",
       "catalyst",
+      "vercel-chat-sdk",
       "slack",
     ],
     implementation: [
@@ -756,7 +766,323 @@ export const TICKETS: Ticket[] = [
       },
     ],
     whyThisMatters:
-      "This ticket operationalizes Harvey's biggest 2026 product launch. Without it, Agent Builder adoption is happening through ad-hoc conversations and AE intuition. With it, every day we are surfacing the customers most likely to expand and giving the AE a written reason why. It is the simplest and most measurable form of product-led growth applied to an enterprise sales motion. And it sets the pattern for how every future Harvey product launch becomes a pipeline event automatically.",
+      "This workflow operationalizes the answer to Harvey's public strategic question: if every law firm buys Harvey, how does Harvey differentiate itself? The product answer is Memory, Workflow Agents, and Agent Builder. This ticket is how that answer gets delivered at the GTM layer — every day, the customers most likely to adopt the new capability get surfaced to the right AE with a written reason why. It is the simplest and most measurable form of PLG applied to an enterprise motion. And it sets the pattern for how every future Harvey product launch becomes a daily pipeline event rather than a week-one announcement.",
+  },
+
+  {
+    id: "GTM-005",
+    title: "Post-Call Commitment Tracker",
+    priority: "P1",
+    effort: "2 weeks",
+    sprint: "Month 2",
+    status: "ready",
+    reporter: "Rob Saliterman, VP Sales",
+    labels: ["deal-velocity", "commitment-tracking", "rep-hygiene"],
+    oneLiner:
+      "Parse every Gong call for commitments the Harvey rep made to the customer, auto-create SFDC tasks with due dates, and confirm with the rep in Slack before anything writes to the opp.",
+    topPerformerMove:
+      "The best AE keeps a notebook on her desk of 'things I said I'd do.' After every customer call she scans the Gong transcript while it's fresh, pulls the commitments into her task list, and clears them within 24 hours. Below-average reps drop roughly 30% of commitments on the floor. The workflow runs her exact scan on every call the team takes — the rep still owns the commitments, the agent just stops them from falling through.",
+    roiMath: {
+      cost: "$12K eng + ~$600/mo Claude API",
+      savings: "Recovers dropped commitments that stall AmLaw procurement. Two rescued $200K-ACV deals per quarter is a conservative floor.",
+      multiplier: "~50x first-year return if the floor holds",
+      payback: "First rescued deal",
+    },
+    background: [
+      "Harvey's AmLaw and enterprise sales cycles are 3-6 months and commitment-dense. Every customer call produces 2-5 rep-side commitments — 'I'll send the security questionnaire Friday,' 'we'll run the model card by our research team,' 'let me pull the sample outputs for your practice group by Wednesday.' Each one is a load-bearing promise to a General Counsel who equates 'forgot to send' with 'not a serious vendor.'",
+      "Top AEs track commitments obsessively and clear them inside 24 hours. Below-average reps drop roughly 30%, and those drops correlate with deals that stall in weeks 4-8 of procurement. The rep thinks the lull is the security review; the customer is waiting on the thing the rep forgot to send in week 2.",
+      "This workflow encodes the top AE's exact process — watch the Gong transcript right after the call ends, copy commitments into a list with due dates, work the list — and runs it automatically across every call the team takes. The rep reviews and confirms. The system never creates a task without a human tap.",
+      "Reuses the Gong infrastructure stood up for GTM-001 (Pre-Call Brief). Additive cost is minimal because the data is already flowing.",
+    ],
+    acceptanceCriteria: [
+      "Every Gong call the Harvey sales team records is automatically parsed for rep-side commitments within 5 minutes of call end.",
+      "Commitments are extracted with speaker attribution (only commitments made by the Harvey rep), natural-language due dates normalized to ISO, and a confidence score per commitment.",
+      "The rep receives a Slack DM via Vercel Chat SDK within 5 minutes of call end with the extracted commitments and three one-click buttons per commitment: confirm, edit, or reject. No SFDC task is created until the rep confirms.",
+      "Confirmed commitments become SFDC tasks on the opportunity with the due date, the verbatim commitment text, and a link back to the Gong call.",
+      "Every confirm/edit/reject streams to Snowflake `rep_commitments` as training data for the weekly prompt retune.",
+      "Speaker attribution is pass^k=1 on a 20-call gold set: the system never attributes a customer commitment to the Harvey rep.",
+      "If confidence on every commitment in a call is below threshold, the system fails silently — it never fabricates a commitment or sends a noisy 'nothing found' DM.",
+    ],
+    architecture: [
+      {
+        layer: 1,
+        name: "Sense — Gong Webhook on Call-Ended",
+        detail:
+          "Gong webhook fires when a call is transcribed and ready. A Vercel API route receives the payload, extracts callId and opportunity association, and enqueues downstream work via a Vercel Workflows durable job.",
+        tools: ["gong", "vercel-workflows"],
+      },
+      {
+        layer: 2,
+        name: "Hydrate — Pull Transcript and Opportunity Context",
+        detail:
+          "Gong `/calls/{id}/transcript` returns the full transcript with speaker attribution. SFDC is pulled for opportunity stage, deal size, and last-meeting context. The three inputs feed the decide step.",
+        tools: ["gong", "salesforce"],
+      },
+      {
+        layer: 3,
+        name: "Decide — Claude Extracts Rep-Side Commitments",
+        detail:
+          "Vercel AI SDK v6 calls Claude Sonnet via the AI Gateway with a focused prompt: extract every commitment the Harvey rep made, require speaker attribution, return verbatim text plus ISO due date plus confidence score plus the 30-second transcript window around where it was spoken. Zod schema validates the output. Confidence below 0.7 drops the commitment. Speaker attribution below 0.8 drops the commitment. Better to miss than to misattribute.",
+        tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
+      },
+      {
+        layer: 4,
+        name: "Validate — Confidence Gate, Dedupe, Format",
+        detail:
+          "Deterministic layer filters commitments below the confidence threshold, deduplicates against commitments already extracted from the same call (safety net for re-runs), and renders each surviving commitment into a Slack Block Kit card with Confirm / Edit / Reject buttons. If zero commitments survive the gate, no DM is sent.",
+        tools: ["vercel-ai-sdk"],
+      },
+      {
+        layer: 5,
+        name: "Deliver + Record — Slack HITL, SFDC on Confirm, Snowflake Log",
+        detail:
+          "Vercel Chat SDK posts the Slack DM. On Confirm, an SFDC task is created on the opp with due date and Gong source link. On Edit, a Slack modal lets the rep adjust the text or date before the task is created. On Reject, the commitment is logged as rejected training data. Every outcome streams to Snowflake `rep_commitments` for the weekly retune and for Rob's weekly completion-rate report.",
+        tools: ["vercel-chat-sdk", "slack", "salesforce", "snowflake"],
+      },
+    ],
+    stack: [
+      "gong",
+      "salesforce",
+      "vercel-workflows",
+      "vercel-ai-sdk",
+      "vercel-ai-gateway",
+      "claude",
+      "vercel-chat-sdk",
+      "slack",
+      "snowflake",
+    ],
+    implementation: [
+      {
+        phase: 1,
+        weekRange: "Week 1",
+        title: "Shadow, gold set, extraction",
+        tasks: [
+          "Shadow one top AE for a morning. Watch how she tracks commitments today. Time the scan step.",
+          "Pull 20 recent Gong calls with known outcomes from high-value opps. Manually extract rep-side commitments into the gold set.",
+          "Build the Claude extraction prompt. Iterate until ≥90% recall and ≥90% precision against the gold set. Speaker attribution is non-negotiable — pass^k=1 or the ticket doesn't ship.",
+        ],
+      },
+      {
+        phase: 2,
+        weekRange: "Week 2",
+        title: "Slack HITL, SFDC write, canary",
+        tasks: [
+          "Build the Vercel API route that receives Gong webhooks and enqueues the durable workflow step.",
+          "Build the Slack Block Kit card with Confirm / Edit / Reject via Vercel Chat SDK. Build the SFDC task write on Confirm and the edit-modal handler.",
+          "Wire `rep_commitments` logging to Snowflake.",
+          "Ship to one AE pod as canary. Monitor confirm / edit / reject ratio for 5 business days. Daily review with Rob.",
+        ],
+      },
+    ],
+    risks: [
+      {
+        risk: "Extraction misses commitments a human would have caught.",
+        likelihood: "Medium",
+        mitigation:
+          "Gold set backtest against 20 hand-extracted calls. Threshold tuned for recall before precision (better to surface an extra commitment the rep rejects than to miss a real one). Reps can flag missed commitments via a Gong comment that feeds the retune job.",
+      },
+      {
+        risk: "Customer-side commitments leak into the rep's task list.",
+        likelihood: "Low",
+        mitigation:
+          "Speaker attribution is hard-gated at confidence 0.8. Misattribution is a trust-killer so the system drops any ambiguous commitment rather than guessing.",
+      },
+      {
+        risk: "Vague commitments ('I'll get back to you') create useless tasks.",
+        likelihood: "Medium",
+        mitigation:
+          "The prompt explicitly instructs the model to skip commitments without a specific deliverable or due date. 'I'll send the security questionnaire by Friday' ships; 'I'll follow up' gets dropped.",
+      },
+      {
+        risk: "Reps ignore the Slack DMs because the volume is too high.",
+        likelihood: "Low",
+        mitigation:
+          "Confidence thresholds cap most calls at 1-3 surfaced commitments. If a rep gets more than 5 per day, the thresholds auto-raise via the retune job.",
+      },
+    ],
+    validation: [
+      {
+        metric: "Speaker attribution accuracy",
+        target: "pass^k=1 on the 20-call gold set",
+        why: "Misattributing a customer commitment to the rep is the one mistake that kills trust permanently. Zero tolerance.",
+      },
+      {
+        metric: "Extraction recall",
+        target: "≥90% of hand-extracted commitments on the gold set",
+        why: "Below this, reps can't trust the system to catch the load-bearing promises.",
+      },
+      {
+        metric: "Rep rejection rate",
+        target: "<10% of surfaced commitments",
+        why: "Above this, the DMs become noise and the system dies from opt-out.",
+      },
+      {
+        metric: "Rep completion rate on confirmed commitments",
+        target: "≥80% within 24 hours",
+        why: "The whole point. If reps confirm but don't complete, the workflow is surfacing noise, not fixing behavior.",
+      },
+    ],
+    whyThisMatters:
+      "Harvey sells to General Counsels and managing partners who measure vendor seriousness by how precisely promises are kept. Enterprise cycles are commitment-dense by nature, and dropped commitments are one of the top reasons deals stall out in weeks 4-8 of procurement. Top AEs track these obsessively. Most AEs don't. This workflow turns the top performer's private notebook into a team-wide system. Cheap to build, reuses Gong and SFDC infrastructure from GTM-001, and directly addresses Harvey's rep-ramp dependency on ex-Big Law attorneys who have relationship instincts but not necessarily CRM hygiene.",
+  },
+
+  {
+    id: "GTM-006",
+    title: "Competitive Mention Radar",
+    priority: "P1",
+    effort: "2 weeks",
+    sprint: "Month 3",
+    status: "ready",
+    reporter: "Rob Saliterman, VP Sales",
+    labels: ["competitive", "battlecard", "deal-velocity"],
+    oneLiner:
+      "Daily scan of Gong calls and SFDC email sync for competitor mentions. Classify intent, match to the battlecard, and DM the owning AE with a tailored counter before the next customer touchpoint.",
+    topPerformerMove:
+      "The best AE has battlecard reflexes. When she hears 'we're also evaluating Legora' she has a three-sentence counter ready in the next breath — name one thing Harvey does that the competitor can't, acknowledge the thing the competitor does better, redirect to the outcome the customer actually cares about. Most reps hear the same competitor name and freeze, then send a generic follow-up email that pretends the mention never happened. This workflow gives every AE the top AE's reflex on every call.",
+    roiMath: {
+      cost: "$10K eng + ~$500/mo Claude API",
+      savings: "One recovered competitive deal per month at $150K ACV is the floor — likely more given the rate of mentions in an active market",
+      multiplier: "~180x first-year return at the floor",
+      payback: "First recovered competitive deal",
+    },
+    background: [
+      "The AmLaw legal AI market has four serious players as of April 2026: Harvey, Legora (Harvey's fastest-growing direct rival at a $5.55B valuation, roughly half Harvey's ARR), Thomson Reuters CoCounsel (positioning around authoritative research with citations — 1M+ professionals on platform in February 2026), and internal builds running on foundation models or Anthropic's Claude Cowork. Customers probe the comparison in nearly every evaluation call.",
+      "When a competitor comes up, the AE has roughly 10 seconds to respond well or poorly. Top AEs have the battlecard memorized and hit back with specific, current counters. Most don't, and the mention becomes an uncomfortable silence followed by a generic follow-up email that nobody reads.",
+      "The competitive landscape changes monthly. Legora raised $550M in March 2026. CoCounsel crossed a million users. Foundation-model competitors are a structural squeeze from below. Any static battlecard is out of date within 30 days.",
+      "This workflow scans every Gong call and SFDC email thread every few hours, flags competitor mentions, classifies intent (exploratory mention / active evaluation / committed to competitor / internal build), extracts the specific objection, matches to the current battlecard in Notion, and routes a tailored counter to the owning AE within 5 minutes.",
+    ],
+    acceptanceCriteria: [
+      "A scheduled job runs every 4 hours. New Gong transcripts and SFDC email sync rows are pulled into Snowflake.",
+      "Every mention of Legora, Thomson Reuters CoCounsel, Anthropic Claude Cowork, Paxton / Vincent AI, Spellbook, Hebbia, LexisNexis Protégé, or 'internal build' language is flagged and classified.",
+      "Each classification includes the specific objection or question the customer raised, in the customer's own words.",
+      "The owning AE receives a Slack DM via Vercel Chat SDK within 5 minutes of the flagged mention with: the mention context, the classification, the objection, the matched battlecard counter, and a one-click 'insert into my next email' button.",
+      "The battlecard lives in Notion, version-controlled, updated weekly by Rob or product marketing. The agent re-reads the battlecard on every run so updates propagate without a deploy.",
+      "Classification confuses 'co-counsel' (the legal term — used all the time in AmLaw calls) with 'CoCounsel' (the Thomson Reuters product) less than 5% of the time. Context-aware disambiguation is a non-negotiable test case.",
+      "A weekly digest rolls up to Rob: mention counts per competitor, AE insertion rate per counter, and any unclassified 'AI legal tool' mentions that could indicate a new entrant.",
+    ],
+    architecture: [
+      {
+        layer: 1,
+        name: "Sense — Gong + SFDC Sync into Snowflake",
+        detail:
+          "Fivetran replicates the last Gong transcript batch and the last SFDC email thread batch into Snowflake every hour. The competitive radar query runs against new rows only to avoid reprocessing historical data.",
+        tools: ["gong", "salesforce", "fivetran", "snowflake"],
+      },
+      {
+        layer: 2,
+        name: "Filter — Keyword Prefilter with Notion-Sourced Keyword List",
+        detail:
+          "A deterministic Snowflake query filters new rows for competitor name mentions. The keyword list lives in Notion and is re-read on every run, so Rob can add a new competitor in 10 seconds without a deploy. This shrinks the LLM workload from every call to only the calls where a mention is plausible.",
+        tools: ["snowflake", "notion"],
+      },
+      {
+        layer: 3,
+        name: "Decide — Claude Classifies Mention + Extracts Objection",
+        detail:
+          "For each flagged mention, Vercel AI SDK v6 calls Claude Sonnet via the AI Gateway with the 30-second context window around the mention, customer history, and the current Notion battlecard. Returns a typed JSON object: competitor name, classification (exploratory / active eval / committed / internal build), objection text in the customer's own words, matched battlecard counter, and a confidence score. The prompt explicitly disambiguates 'co-counsel' (legal term) from 'CoCounsel' (product).",
+        tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
+      },
+      {
+        layer: 4,
+        name: "Validate — Confidence Gate, Dedupe",
+        detail:
+          "Filter out mentions below 0.75 confidence. Deduplicate against mentions already flagged in the last 7 days for the same (AE, customer, competitor) triple. Silent failure on zero hits.",
+        tools: ["vercel-ai-sdk"],
+      },
+      {
+        layer: 5,
+        name: "Deliver + Record — Slack DM, Snowflake Log, Weekly Digest to Rob",
+        detail:
+          "Vercel Chat SDK posts the Slack DM to the account-owning AE with the mention context, classification, objection, battlecard counter, and a one-click 'insert into next email' modal. Every mention and outcome streams to Snowflake `competitive_mentions`. The weekly digest to Rob pulls from that table — mention counts per competitor, insertion rate per AE, unclassified AI legal tool mentions.",
+        tools: ["vercel-chat-sdk", "slack", "snowflake"],
+      },
+    ],
+    stack: [
+      "gong",
+      "salesforce",
+      "fivetran",
+      "snowflake",
+      "notion",
+      "vercel-ai-sdk",
+      "vercel-ai-gateway",
+      "claude",
+      "vercel-workflows",
+      "vercel-chat-sdk",
+      "slack",
+    ],
+    implementation: [
+      {
+        phase: 1,
+        weekRange: "Week 1",
+        title: "Battlecard source of truth + classification prompt",
+        tasks: [
+          "Workshop with Rob to write the current battlecard for each competitor: one specific Harvey win, one acknowledged competitor strength, one redirect framing. Stand it up in Notion with version history.",
+          "Build the Snowflake keyword prefilter query against the last 90 days of Gong + SFDC data. Validate the hit rate — too many mentions per day means the keyword list is too loose.",
+          "Build the Claude classification prompt. Run it against 50 historical mentions with known competitor + outcome. Target ≥90% classification accuracy. Explicitly validate the 'co-counsel' / 'CoCounsel' disambiguation on 20 ambiguous cases.",
+        ],
+      },
+      {
+        phase: 2,
+        weekRange: "Week 2",
+        title: "Slack HITL flow and weekly digest",
+        tasks: [
+          "Build the Slack DM and 'insert into next email' modal via Vercel Chat SDK.",
+          "Wire `competitive_mentions` logging and the weekly digest query to Rob.",
+          "Ship to 3 canary AEs. Monitor insertion rate and objection relevance for 5 business days.",
+          "Publish the first weekly digest. Establish the battlecard update cadence with Rob and product marketing.",
+        ],
+      },
+    ],
+    risks: [
+      {
+        risk: "Battlecard counters sound generic and AEs ignore them.",
+        likelihood: "Medium",
+        mitigation:
+          "The battlecard is a Rob + product marketing deliverable, not automated. The agent retrieves and matches; the counters themselves are hand-crafted. Weekly digest forces Rob to see which counters land and which get ignored, so the battlecard stays under real-world pressure.",
+      },
+      {
+        risk: "'Co-counsel' (the legal term) triggers false positives for CoCounsel (the Thomson Reuters product).",
+        likelihood: "High",
+        mitigation:
+          "Context-aware classification via Claude. The prompt explicitly distinguishes the legal term ('co-counsel on a matter') from the product. Validated on 20 ambiguous historical mentions before ship. False positive rate measured weekly.",
+      },
+      {
+        risk: "Competitor name mentioned in a friendly context (customer complimenting both tools) triggers a battlecard counter the AE doesn't need.",
+        likelihood: "Medium",
+        mitigation:
+          "Classification step handles this — 'exploratory mention' classification sends a lighter notification without the 'insert into email' CTA.",
+      },
+      {
+        risk: "Keyword list misses a new competitor that enters the market.",
+        likelihood: "Medium",
+        mitigation:
+          "Rob can add a new name to the Notion keyword list in 10 seconds. Weekly digest includes 'unclassified AI legal tool mentions' so the team can spot new entrants via transcript signal before the keyword list catches up.",
+      },
+    ],
+    validation: [
+      {
+        metric: "Classification accuracy on historical set",
+        target: "≥90% agreement with manual labeling of 50 historical mentions",
+        why: "Below this, the DMs become noise and AEs opt out.",
+      },
+      {
+        metric: "AE insertion rate on delivered counters",
+        target: "≥40% of counters inserted into an email",
+        why: "Tells us the counters are landing. If low, the battlecard itself needs work — not the agent.",
+      },
+      {
+        metric: "Time from mention to AE DM",
+        target: "<5 minutes median",
+        why: "The value is reflex speed. Past 15 minutes the AE has already moved on.",
+      },
+      {
+        metric: "Competitive win rate lift vs 90-day baseline",
+        target: "+5pt",
+        why: "The reason this exists. Lagging indicator, but the one that matters to Rob.",
+      },
+    ],
+    whyThisMatters:
+      "The AmLaw legal AI market is four serious players deep and getting deeper. Legora is growing fast. CoCounsel is reframing the category around authoritative research. Foundation-model competitors are a structural squeeze from below. Every competitive mention in a customer conversation is a hinge — a weak response loses the deal, a sharp one bends it. This workflow arms every AE with the top AE's battlecard reflex on every call, keeps the battlecard current because the source of truth is a Notion doc Rob updates weekly, and turns competitive intel into a shipping ritual rather than a quarterly slide deck. It reuses the Gong and SFDC infrastructure from GTM-001 and GTM-005 — additive cost is minimal because the data is already in Snowflake.",
   },
 ];
 

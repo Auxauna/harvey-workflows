@@ -15,7 +15,8 @@ export type ToolCategory =
   | "calls"
   | "pm"
   | "docs"
-  | "chat";
+  | "chat"
+  | "email";
 
 export interface Tool {
   id: string;
@@ -31,27 +32,27 @@ export const TOOLS: Record<string, Tool> = {
     name: "Clay",
     category: "enrichment",
     description:
-      "AI-native data orchestration platform for prospecting, enrichment, and outbound research workflows.",
+      "AI-native data orchestration platform for prospecting, enrichment, and outbound research workflows. Waterfall enrichment is a native primitive — pay only when a provider returns a hit.",
     role:
-      "Primary enrichment layer for sales-led motions. Used for waterfall enrichment, claygents, and on-demand account research.",
+      "Primary enrichment layer and the practical source of LinkedIn-derived signal (job changes, recent posts, shared connections) now that LinkedIn's Sales Navigator API is closed to new partners. Used for waterfall enrichment, claygents, and on-demand account research.",
   },
   scalestack: {
     id: "scalestack",
     name: "Scalestack",
     category: "enrichment",
     description:
-      "AI-powered RevOps automation platform for account research, scoring, and segmentation.",
+      "Global enterprise GTM orchestration platform layering 60+ data providers behind a single API. Used for account research, scoring, and segmentation.",
     role:
-      "Newer addition to the stack. Strongest on international firmographic data and segment-specific account scoring.",
+      "On the bench. Available as a secondary enrichment path for accounts where Clay and ZoomInfo both miss. Not used in the default waterfall for v1.",
   },
   zoominfo: {
     id: "zoominfo",
     name: "ZoomInfo",
     category: "enrichment",
     description:
-      "Enterprise contact and company intelligence platform with intent data, technographic insights, and CRM integrations.",
+      "Enterprise contact and company intelligence platform with intent data, technographic insights, and CRM integrations. Enrich API supports real-time, scheduled, and on-demand modes with a ~1,500 req/min rate limit.",
     role:
-      "System of record for B2B contact data inside Salesforce. Provides intent signals via ZoomInfo Copilot.",
+      "Primary firmographic and contact data source inside Salesforce. Default first call in every enrichment waterfall.",
   },
   marketo: {
     id: "marketo",
@@ -60,25 +61,25 @@ export const TOOLS: Record<string, Tool> = {
     description:
       "Adobe Marketo Engage. Enterprise marketing automation platform for lead scoring, nurture programs, and lead-to-account matching.",
     role:
-      "Top-of-funnel system. Captures form fills, runs scoring rules, and syncs qualified leads to Salesforce.",
+      "Top-of-funnel system. Captures form fills, runs scoring rules, and syncs qualified leads to Salesforce. Transactional sends have been migrated to Resend for Vercel-native delivery — Marketo stays focused on nurture and lifecycle.",
   },
   salesforce: {
     id: "salesforce",
     name: "Salesforce",
     category: "crm",
     description:
-      "Sales Cloud. The system of record for accounts, contacts, opportunities, and the source of truth for revenue.",
+      "Sales Cloud. The system of record for accounts, contacts, opportunities, and the source of truth for revenue. Platform Events and CDC streams expose real-time change data without polling.",
     role:
-      "Center of gravity for the GTM motion. Every workflow either reads from or writes to SFDC.",
+      "Center of gravity for the GTM motion. Every workflow either reads from or writes to SFDC. Real-time triggers use Platform Events rather than Workato polling to avoid 5-minute jitter on time-sensitive flows.",
   },
   catalyst: {
     id: "catalyst",
-    name: "Catalyst",
+    name: "Catalyst (by Totango)",
     category: "success",
     description:
-      "Customer success platform for health scoring, account management, and expansion signal detection.",
+      "Customer success platform for health scoring, account management, and expansion signal detection. Part of the Totango suite since the February 2024 merger.",
     role:
-      "Post-close customer journey layer. Tracks health, expansion signals, and routes engagement events to CSMs.",
+      "Post-close customer journey layer. Tracks health, expansion signals, and routes engagement events to CSMs. Agent Builder upsell signals log here as customer engagement events alongside the CSM's own account notes.",
   },
   zendesk: {
     id: "zendesk",
@@ -94,27 +95,27 @@ export const TOOLS: Record<string, Tool> = {
     name: "Workato",
     category: "orchestration",
     description:
-      "Enterprise iPaaS for orchestrating synchronous and event-driven workflows across SaaS tools and data systems. Workato Enterprise MCP (launched Feb 2026) exposes recipes as callable services for external AI agents.",
+      "Enterprise iPaaS for orchestrating synchronous and event-driven workflows across SaaS tools and data systems. Workato Enterprise MCP (Feb 2026) exposes recipes as callable services for external AI agents.",
     role:
-      "Glue layer for cross-tool automations. Recipes route data, trigger workflows, and handle conditional logic across the stack. Workato Genies act as autonomous agents for multi-step business processes.",
+      "Glue layer for cross-tool automations. Recipes route data, trigger workflows, and handle conditional logic across the stack. Event-driven triggers (Salesforce Platform Events, Gong webhooks) are preferred over polling for any time-sensitive flow.",
   },
   fivetran: {
     id: "fivetran",
     name: "Fivetran",
     category: "data",
     description:
-      "Managed ELT pipelines for replicating SaaS source data into the Snowflake warehouse on a scheduled cadence.",
+      "Managed ELT pipelines for replicating SaaS source data into the Snowflake warehouse on configurable sync frequency (5 min to 24 hr).",
     role:
-      "Background data movement. Pulls from Salesforce, Marketo, Catalyst, Zendesk, and product analytics into Snowflake hourly or daily.",
+      "Background data movement. Pulls from Salesforce, Marketo, Catalyst, Zendesk, Gong, and product analytics into Snowflake on an hourly or faster cadence. Every signal detection workflow reads from the Fivetran-replicated tables rather than calling source APIs directly.",
   },
   snowflake: {
     id: "snowflake",
     name: "Snowflake",
     category: "warehouse",
     description:
-      "Cloud data warehouse and AI Data Cloud. Cortex AI Functions (GA November 2025) and Cortex Agents enable running Claude and other models inline against warehouse data without leaving the system.",
+      "Cloud data warehouse and AI Data Cloud. Cortex AI Functions (GA November 2025) and Cortex Agents run Claude inline against warehouse data without leaving the system.",
     role:
-      "Where every GTM dataset lands. Analytics, scoring models, attribution, and Cortex-powered AI compute all run here. The single source of truth that other workflows read from.",
+      "Where every GTM dataset lands. Analytics, scoring models, attribution, eval sets, and Cortex-powered AI compute all run here. The single source of truth that other workflows read from and the canonical audit trail for every agent decision.",
   },
   linear: {
     id: "linear",
@@ -123,7 +124,7 @@ export const TOOLS: Record<string, Tool> = {
     description:
       "Issue tracking and project management for engineering and cross-functional GTM work.",
     role:
-      "Where this very ticket lives. The engineering source of truth for what's shipped, in progress, and backlogged.",
+      "Where this very roadmap lives. The engineering source of truth for what's shipped, in progress, and backlogged.",
   },
   notion: {
     id: "notion",
@@ -132,7 +133,7 @@ export const TOOLS: Record<string, Tool> = {
     description:
       "Knowledge base, documentation layer, and structured data store for cross-functional teams.",
     role:
-      "Where audits, runbooks, and architecture docs live. Used for the artifacts that don't belong in Linear or Snowflake.",
+      "Where audits, runbooks, architecture docs, and the competitive battlecard live. The battlecard is version-controlled in Notion and re-read by the competitive radar agent on every run so updates propagate without a deploy.",
   },
   qualified: {
     id: "qualified",
@@ -148,9 +149,9 @@ export const TOOLS: Record<string, Tool> = {
     name: "Gong",
     category: "calls",
     description:
-      "Revenue intelligence platform that records, transcribes, and analyzes sales calls and customer conversations.",
+      "Revenue intelligence platform that records, transcribes, and analyzes sales calls and customer conversations. Public API exposes call metadata, transcripts, and summaries via /v2/calls/extensive and /calls/{id}/transcript.",
     role:
-      "Source of truth for what was actually said in customer conversations. Pulled into briefs, scoring, and signal detection.",
+      "Source of truth for what was actually said in customer conversations. Pulled into briefs, commitment tracking, competitive radar, and signal detection. Webhooks on call-ended are the primary trigger for post-call agents.",
   },
   slack: {
     id: "slack",
@@ -159,70 +160,79 @@ export const TOOLS: Record<string, Tool> = {
     description:
       "Team messaging and notifications hub. Where reps actually live during their work day.",
     role:
-      "Delivery surface for every workflow. If a system needs to reach a rep, it does so via Slack DM or channel post.",
+      "Canonical HITL surface for every agent on this roadmap. Reps review drafts, confirm commitments, and one-click approve actions before anything reaches a customer. Integration is via Vercel Chat SDK rather than a bespoke Slack bot.",
+  },
+  vercelChatSdk: {
+    id: "vercel-chat-sdk",
+    name: "Vercel Chat SDK",
+    category: "vercel",
+    description:
+      "Unified chat adapter framework from Vercel Labs (@chat-adapter/slack). Ships interactive buttons, cards, modals, and event handlers via JSX. Integrates directly with the AI SDK for tool-calling agents.",
+    role:
+      "The human-in-the-loop primitive. Every agent that writes to Slack does so through Chat SDK, so approve/reject/edit buttons are first-class and the HITL pattern is the same shape across every workflow.",
+  },
+  resend: {
+    id: "resend",
+    name: "Resend",
+    category: "email",
+    description:
+      "Developer-first transactional email API with a React Email component library. Built by Vercel alumni; tight integration with Next.js and the Vercel deployment surface.",
+    role:
+      "Transactional delivery surface for every agent-generated email (pre-call briefs, commitment confirmations, competitive battlecards). Replaces Marketo's transactional API for agent flows because the Vercel-native SDK, React Email templates, and observability story match how the rest of the stack ships.",
   },
   vercelSdk: {
     id: "vercel-ai-sdk",
     name: "Vercel AI SDK",
     category: "vercel",
     description:
-      "TypeScript SDK for building AI applications with a unified provider interface across Anthropic, OpenAI, Google, and others.",
+      "TypeScript SDK (v6, December 2025) for building AI applications with a unified provider interface. Ships DurableAgent, tool-calling loops with structured output, streaming, full MCP support with OAuth, tool-execution approval, and DevTools.",
     role:
-      "Foundation for every AI workflow Harvey builds internally. Provides generateText, generateObject, tool calling, and streaming.",
+      "Foundation for every AI workflow on this roadmap. generateText, generateObject, and DurableAgent are the three primitives. Tool-execution approval is how HITL gates get enforced at the SDK layer before Slack ever sees the request.",
   },
   vercelGateway: {
     id: "vercel-ai-gateway",
     name: "Vercel AI Gateway",
     category: "vercel",
     description:
-      "Unified routing, caching, and observability layer for LLM calls across multiple providers.",
+      "Unified routing, caching, and observability layer for LLM calls across providers. GA since August 2025. Claude Sonnet 4.6 (1M context) and Opus 4.6 are both live on the Gateway with prompt caching and batch support.",
     role:
-      "Single integration point for all model providers. Handles failover, cost optimization, and unified billing.",
+      "Single integration point for Claude and any future model. Handles failover, cost tracking, and observability without per-workflow auth management.",
   },
   vercelSandbox: {
     id: "vercel-sandbox",
     name: "Vercel Sandbox",
     category: "vercel",
     description:
-      "Isolated execution environment for running untrusted code or agent tool calls in a secure container.",
+      "Isolated execution environment for running untrusted code or agent tool calls in a secure container. GA since January 2026.",
     role:
-      "Used for any workflow step that runs generated code, executes tools, or needs ephemeral compute with strong isolation.",
+      "Reserved for workflow steps that execute generated code — not used in v1 of any workflow on this roadmap. Available for future workflows where the Decide step generates SQL, executable transforms, or shell commands that need sandboxing before Act.",
   },
   vercelWorkflows: {
     id: "vercel-workflows",
-    name: "Vercel Workflows",
+    name: "Vercel Workflow DevKit",
     category: "vercel",
     description:
-      "Durable, scheduled, event-driven workflow orchestration with built-in retries, observability, and step management.",
+      "Durable, scheduled, event-driven workflow orchestration with deterministic replay, built-in retries, observability, and step management. Public beta. Survives crashes, deploys, and indefinite pauses without consuming resources.",
     role:
-      "Powers scheduled jobs and long-running orchestrations. The runtime layer for daily signal detection and recurring sync work.",
+      "Runtime for scheduled jobs and long-running orchestrations — daily signal detection, recurring sync work, and any agent that waits for a human HITL gate. Survives deploys mid-run, which is the primitive that makes the weekend-MVP-then-harden pattern safe at production scale.",
   },
   claude: {
     id: "claude",
     name: "Claude",
     category: "ai",
     description:
-      "Anthropic Claude — Sonnet 4.6 for fast extraction and reasoning, Opus 4.6 for synthesis and complex judgment.",
+      "Anthropic Claude — Sonnet 4.6 (1M context) for fast extraction and reasoning, Opus 4.6 for synthesis and complex judgment. Accessed via Vercel AI Gateway with prompt caching.",
     role:
-      "The reasoning layer for every workflow. Sonnet handles the heavy parallel work, Opus handles the final judgment.",
-  },
-  linkedin: {
-    id: "linkedin",
-    name: "LinkedIn Sales Navigator",
-    category: "enrichment",
-    description:
-      "Professional network data for contact research, role changes, and recent activity.",
-    role:
-      "Pulled in real-time for pre-call brief generation. Used to surface recent posts, job changes, and shared connections.",
+      "The reasoning layer for every workflow. Sonnet handles the heavy parallel work, Opus handles the final judgment where stakes are higher (competitive positioning, expansion value hypothesis).",
   },
   firecrawl: {
     id: "firecrawl",
     name: "Firecrawl",
     category: "data",
     description:
-      "Web scraping and crawling API with an /agent endpoint that takes a natural-language prompt and returns structured data extracted from any public website. Handles JS rendering, pagination, and rate limiting natively.",
+      "Web scraping and crawling API. The /agent endpoint, launched February 2026 as the evolution of /extract, takes a natural-language prompt and returns structured data extracted from any public website. Handles JS rendering, pagination, and rate limiting natively via Spark 1 models.",
     role:
-      "Currently in pilot at Harvey. The /agent endpoint is the right primitive for any structured extraction problem against the public web — law firm sites, attorney bios, deal tombstones, anywhere the data is not already in an API.",
+      "Currently in pilot at Harvey. The /agent endpoint is the right primitive for any structured extraction problem against the public web — law firm client pages, attorney bios, deal tombstones. Known gotchas: billed on failure, credit-based pricing on top of tier, no published max-pages per call.",
   },
 };
 
