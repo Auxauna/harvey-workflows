@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Sidebar } from "@/components/sidebar";
+import { MobileShell } from "@/components/mobile-shell";
 import { PropertiesPanel } from "@/components/properties-panel";
 import { BackgroundSection } from "@/components/background-section";
 import { AcceptanceCriteria } from "@/components/acceptance-criteria";
@@ -27,9 +27,7 @@ export default async function TicketPage({
   if (!ticket) notFound();
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
+    <MobileShell>
         {/* Breadcrumb */}
         <div className="hairline-b bg-bg-base px-10 py-4">
           <div className="flex items-center gap-2 text-xs">
@@ -132,8 +130,7 @@ export default async function TicketPage({
             </div>
           </div>
         </div>
-      </main>
-    </div>
+    </MobileShell>
   );
 }
 

@@ -1,14 +1,12 @@
-import { Sidebar } from "@/components/sidebar";
+import { MobileShell } from "@/components/mobile-shell";
 import { ProjectHeader } from "@/components/project-header";
 import { TicketCard } from "@/components/ticket-card";
 import { TICKETS } from "@/lib/tickets";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <ProjectHeader />
+    <MobileShell>
+      <ProjectHeader />
 
         <div className="px-10 py-8">
           <div className="mb-5 flex items-baseline justify-between">
@@ -40,7 +38,6 @@ export default function Home() {
             </p>
           </div>
         </div>
-      </main>
-    </div>
+    </MobileShell>
   );
 }

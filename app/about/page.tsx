@@ -1,12 +1,10 @@
 import Link from "next/link";
-import { Sidebar } from "@/components/sidebar";
+import { MobileShell } from "@/components/mobile-shell";
 
 export default function AboutPage() {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="px-10 py-12 max-w-3xl">
+    <MobileShell>
+      <div className="px-10 py-12 max-w-3xl">
           <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-accent-forest">
             About this artifact
           </div>
@@ -107,7 +105,6 @@ export default function AboutPage() {
             </Link>
           </div>
         </div>
-      </main>
-    </div>
+    </MobileShell>
   );
 }
