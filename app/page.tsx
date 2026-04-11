@@ -13,7 +13,7 @@ export default function Home() {
       <div className="px-10 py-8">
         <div className="mb-5 flex items-baseline justify-between">
           <h2 className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
-            Workflow Examples · {TICKETS.length}
+            Tickets · {TICKETS.length}
           </h2>
           <div className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
             <span>Sorted by Sprint</span>
@@ -31,12 +31,13 @@ export default function Home() {
             How to read this board
           </div>
           <p className="text-sm text-fg-secondary leading-relaxed font-serif">
-            Six Linear-style tickets, each one a worked example of how the function ships.
-            Every ticket leads with the problem, names the top performer&apos;s existing
-            move, and shows the ROI math before the architecture. The principles repeat:
-            shadow the best performer first, pick the 10x lever, build the pipeline before
-            the prompt, treat Slack as the human-in-the-loop surface, measure with evals
-            not vibes. See the about page for the full charter and the 90-day calendar.
+            Seven Linear-style tickets. GTM-000 is the Month 1 BA diagnostic — shadow,
+            interview, baseline, triage, audit — and it&apos;s a first-class deliverable,
+            not a preamble. GTM-001 through GTM-006 are the workflow examples that ship in
+            Months 2 and 3, each one grounded in what Month 1 uncovers. Every ticket opens
+            with its own first-principles framing, because the JD asks for a portfolio of
+            AI first principles — not a copy-paste template. See the about page for the
+            full charter.
           </p>
         </div>
       </div>

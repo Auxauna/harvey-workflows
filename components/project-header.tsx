@@ -33,7 +33,7 @@ export function ProjectHeader() {
           <Stat label="Function" value="GTM Technology" />
           <Stat label="Sprint" value="First 90 Days" />
           <Stat label="Quarter" value="Q2 2026" />
-          <Stat label="Workflow Examples" value={String(totalEffort)} />
+          <Stat label="Tickets" value={String(totalEffort)} />
           <Stat label="Tools in Stack" value={String(stackSize)} />
         </div>
       </div>

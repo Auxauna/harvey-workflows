@@ -67,6 +67,15 @@ export default async function TicketPage({
         <div className="px-10 py-10">
           <div className="max-w-5xl grid grid-cols-[1fr_240px] gap-10">
             <div className="space-y-12 min-w-0">
+              <section>
+                <SectionHeader label="First Principles" />
+                <div className="hairline-l border-l-2 border-accent-forest bg-accent-forest-bg/40 px-5 py-4">
+                  <p className="text-[15px] text-fg-primary leading-relaxed font-serif italic">
+                    {ticket.firstPrinciples}
+                  </p>
+                </div>
+              </section>
+
               <BackgroundSection background={ticket.background} label="The Problem" />
 
               {ticket.topPerformerMove && (

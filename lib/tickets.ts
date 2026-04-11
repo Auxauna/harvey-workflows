@@ -47,6 +47,7 @@ export interface Ticket {
   reporter: string;
   labels: string[];
   oneLiner: string;
+  firstPrinciples: string;
   topPerformerMove?: string;
   roiMath?: RoiMath;
   background: string[];
@@ -61,6 +62,179 @@ export interface Ticket {
 
 export const TICKETS: Ticket[] = [
   {
+    id: "GTM-000",
+    title: "Diagnostic Month — Shadow, Interview, Baseline",
+    priority: "P0",
+    effort: "4 weeks",
+    sprint: "Month 1",
+    status: "ready",
+    reporter: "GTM Technology",
+    labels: ["business-analysis", "diagnostic", "stakeholder-interviews", "baseline-metrics"],
+    oneLiner:
+      "Month 1 is pure BA work. Shadow top performers, interview stakeholders, baseline the metrics, triage the existing Linear backlog, audit data integrity. Every build that follows is only as good as this groundwork.",
+    firstPrinciples:
+      "Learn the business before automating it. Every great GTM Business Analyst's first move at a new company is diagnostic — shadow first, build second. Skip this month and every workflow on the board is a guess wearing a confidence score. The creative work only has the right targets after the shadowing.",
+    topPerformerMove:
+      "The best GTM BA's first week at a new company isn't spent building anything. It's spent with a notebook — watching the best AE handle a prospecting call, watching the top CSM scan the weekly health board, watching the segment owner route a lead. Every top performer move this roadmap mirrors downstream was discovered by someone who shut up for a week and watched people work.",
+    roiMath: {
+      cost: "One month of fully-loaded BA time (~$16K)",
+      savings: "Every subsequent ticket targets a real problem instead of a guess — the highest-leverage month in the 90-day plan",
+      multiplier: "Not directly measurable; every workflow on this board sources its top-performer move and ROI assumptions from Month 1",
+      payback: "Every ticket shipped after Month 1 is 'paid back' by this investment",
+    },
+    background: [
+      "The GTM Business Analyst role exists to translate business objectives into technical requirements and ship automations that make the GTM motion faster and more accurate. Every word of that depends on understanding the business first.",
+      "Showing up in Month 1 with a roadmap of things to build is the wrong shape. Showing up in Month 1 with a notebook, a calendar full of shadow sessions and stakeholder interviews, and a list of open questions is the right shape. The creative building work lives in Months 2 and 3 — and it's only credible if Month 1 did the groundwork.",
+      "This ticket is the Month 1 plan as a first-class artifact. Specific shadow targets, specific stakeholder interviews, specific baseline metrics, specific backlog triage activities, specific data integrity audits. It ships a 3-page diagnostic memo at the end that grounds every subsequent ticket on the board in real signal rather than invented ones.",
+    ],
+    acceptanceCriteria: [
+      "Shadow sessions completed with at least five top performers across seats: three AEs (one AmLaw enterprise, one corporate legal, one international or asset manager) and two CSMs managing top 20 customers. Notes live in Notion within 24 hours of each session.",
+      "Stakeholder interviews completed with at least eight leaders across functions: Rob Saliterman (VP Sales), John Haddock (CBO), James Hunsberger (Head of GTM Technology), the RevOps lead, the Marketing Ops lead, the CS lead, the Lead-to-Cash Product owner, and one segment rep leader.",
+      "Baseline metrics captured in Snowflake `gtm_tech_baseline`: deal velocity by segment, lead-to-meeting conversion by source, time-to-first-touch by segment, Agent Builder adoption rate by customer tier, top-20 account health score, and data quality index (dupes / orphans / missing ownership).",
+      "Existing GTM Technology Linear backlog triaged: every open ticket reviewed with James, priorities set, and the first five P1s closed or meaningfully progressed within the month. We help clear the queue before we add to it.",
+      "Data integrity audit completed on the top 50 accounts by ARR: duplicate check, ownership conflict check, missing-field check, stale-record check. Findings in Notion, cleanup tickets opened in Linear for the Month 3 Systems Governance work.",
+      "A 3-page diagnostic memo published by end of Month 1 covering: the GTM motion as observed, the most-shared pain points, the three biggest data hygiene issues, the top-performer moves the roadmap should encode, the top-3 workflow priorities grounded in real signal, and the open questions James and Rob should resolve.",
+    ],
+    architecture: [
+      {
+        layer: 1,
+        name: "Shadow Sessions — 5 Top Performers",
+        detail:
+          "Three AEs (one per segment where possible) and two CSMs. Each session is a half-day with the top performer plus 2-3 follow-up Gong call reviews to see the patterns replay. Notes written same-day to Notion. The goal isn't critique — it's discovering the undocumented moves the top rep makes without realizing they're doing anything special.",
+        tools: ["gong", "notion", "slack"],
+      },
+      {
+        layer: 2,
+        name: "Stakeholder Interviews — 8 Leaders Across Functions",
+        detail:
+          "45-minute interviews with Rob, John, James, the RevOps lead, Marketing Ops lead, CS lead, Lead-to-Cash PM, and one segment rep leader. Same core questions to every interviewee: what's working, what's broken, what would you automate if you had a week, what systems don't talk to each other, what decision gets made with bad data most often. Notes to Notion.",
+        tools: ["notion", "slack"],
+      },
+      {
+        layer: 3,
+        name: "Metric Baselines — 6 Metrics Into Snowflake",
+        detail:
+          "Stand up `gtm_tech_baseline` schema in Snowflake. Populate with six baseline metrics: deal velocity by segment, lead-to-meeting conversion by source, time-to-first-touch by segment, Agent Builder adoption rate, top-20 account health, and data quality index. These are the numbers every workflow on the board gets measured against — without them, ROI claims are fabrication.",
+        tools: ["snowflake", "salesforce", "fivetran"],
+      },
+      {
+        layer: 4,
+        name: "Backlog Triage — Clear Before Adding",
+        detail:
+          "Review every open GTM Technology Linear ticket with James. Close the irrelevant ones, reassign what belongs elsewhere, help clear the first five P1s that are achievable inside Month 1. Demonstrates respect for the existing queue before adding to it — and surfaces any work that should influence the Month 2 plan.",
+        tools: ["linear", "notion"],
+      },
+      {
+        layer: 5,
+        name: "Data Integrity Audit — Top 50 Accounts",
+        detail:
+          "Deterministic audit on the top 50 accounts by ARR. Check for duplicate accounts, ownership conflicts, missing required fields, and stale pipeline records. Write findings to Notion, open cleanup tickets in Linear for the Month 3 GTM-006 Systems Governance work. This is also a preview of what the recurring agent will automate once built.",
+        tools: ["salesforce", "snowflake", "linear", "notion"],
+      },
+    ],
+    stack: ["gong", "notion", "slack", "snowflake", "salesforce", "fivetran", "linear"],
+    implementation: [
+      {
+        phase: 1,
+        weekRange: "Week 1",
+        title: "Shadow sessions + first stakeholder interviews",
+        tasks: [
+          "Monday: shadow top AmLaw enterprise AE for the morning. Shadow top CSM in the afternoon. Notes same day.",
+          "Tuesday: shadow top corporate legal AE. Review three of her recent Gong calls.",
+          "Wednesday: first four stakeholder interviews (Rob, John, James, RevOps lead).",
+          "Thursday: shadow second top CSM. Fifth stakeholder interview (Marketing Ops lead).",
+          "Friday: review Week 1 notes with James. Lock Week 2 interview list.",
+        ],
+      },
+      {
+        phase: 2,
+        weekRange: "Week 2",
+        title: "Finish interviews, stand up baseline metrics",
+        tasks: [
+          "Monday-Tuesday: remaining stakeholder interviews (CS lead, Lead-to-Cash PM, segment rep leader).",
+          "Wednesday-Thursday: stand up `gtm_tech_baseline` in Snowflake. Wire the six metrics from SFDC and Fivetran-replicated product analytics.",
+          "Friday: Linear backlog triage with James. Identify the five P1s to help clear.",
+        ],
+      },
+      {
+        phase: 3,
+        weekRange: "Week 3",
+        title: "Data integrity audit + close the first backlog tickets",
+        tasks: [
+          "Monday-Tuesday: data integrity audit on top 50 accounts by ARR. Write findings to Notion. Open cleanup tickets in Linear.",
+          "Wednesday-Thursday: close or meaningfully advance the five P1 backlog tickets from Week 2.",
+          "Friday: mid-month review with James. Course-correct Month 1 priorities based on what's surfaced so far.",
+        ],
+      },
+      {
+        phase: 4,
+        weekRange: "Week 4",
+        title: "Diagnostic memo + first quick-win canary",
+        tasks: [
+          "Monday-Tuesday: write the 3-page diagnostic memo. Ship to James, Rob, John for review.",
+          "Wednesday-Thursday: ship the GTM-001 Pre-Call Brief canary to one AE pod as the end-of-month quick win. 'I can also build,' not the main deliverable.",
+          "Friday: retrospective with James. Lock the Month 2 plan from the memo's priorities.",
+        ],
+      },
+    ],
+    risks: [
+      {
+        risk: "Top performers don't have time to shadow.",
+        likelihood: "Medium",
+        mitigation:
+          "Rob and John help gatekeep the asks. 30-minute sessions where 45 is a stretch. Fallback: review recent Gong calls asynchronously instead of live shadowing. The point is pattern discovery, not face time.",
+      },
+      {
+        risk: "Stakeholder interviews surface conflicting priorities across functions.",
+        likelihood: "High",
+        mitigation:
+          "Conflicts are the signal — not the problem. The memo names them explicitly and asks James to arbitrate in the Month 1 retro. Surfacing the conflict is more useful than pretending everyone agrees.",
+      },
+      {
+        risk: "Month 1 ends with a memo and zero shipped automation — perceived as slow by the field team.",
+        likelihood: "Medium",
+        mitigation:
+          "The Week 4 GTM-001 canary exists specifically to counter this perception. If Week 4 slips, the memo still ships — the BA work is the deliverable, not a preamble to it. James has cover because the JD says this is BA work first.",
+      },
+      {
+        risk: "Data integrity findings become their own distraction that derails the rest of Month 1.",
+        likelihood: "Medium",
+        mitigation:
+          "Month 1 only audits and opens cleanup tickets. Actual fixes live in GTM-006 Systems Governance starting Month 3. The audit is mapping the problem, not solving it yet.",
+      },
+    ],
+    validation: [
+      {
+        metric: "Shadow sessions completed",
+        target: "5 sessions (3 AEs + 2 CSMs) with notes in Notion",
+        why: "Undocumented top-performer moves are the raw material for every subsequent ticket. Less than 5 is not enough signal.",
+      },
+      {
+        metric: "Stakeholder interviews completed",
+        target: "8 interviews across functions, all with notes in Notion",
+        why: "Cross-functional coverage is the whole point of the BA role per the JD. 8 is the minimum to see the GTM motion end-to-end.",
+      },
+      {
+        metric: "Baseline metrics live in Snowflake",
+        target: "6 metrics populated, queryable, with a visualization",
+        why: "Every workflow on the board is measured against these. No baseline, no credible ROI claims.",
+      },
+      {
+        metric: "Diagnostic memo published",
+        target: "3 pages max, reviewed by James + Rob + John",
+        why: "The memo is the hard deliverable for Month 1 — it grounds every subsequent ticket in real signal rather than guessing.",
+      },
+      {
+        metric: "Backlog tickets advanced",
+        target: "5 P1s from the GTM Technology Linear backlog closed or meaningfully progressed",
+        why: "Demonstrates respect for the existing queue and cross-functional partnership. The build work is not the only work.",
+      },
+    ],
+    whyThisMatters:
+      "This is the load-bearing month. Without it, every workflow ticket on this board is speculation — top-performer moves invented, ROI numbers fabricated, data quality claims unverified. With it, every subsequent ticket sources its design, its ROI math, and its validation plan from the real GTM motion at Harvey as observed in person. The job description says this role is a business analyst first and a builder second. Month 1 is that claim in the hard way: one month of pure BA work, one 3-page memo at the end, zero shipping bias.",
+  },
+
+  {
     id: "GTM-001",
     title: "Pre-Call Brief Automation",
     priority: "P1",
@@ -71,6 +245,8 @@ export const TICKETS: Ticket[] = [
     labels: ["sales-enablement", "rep-productivity", "easy-win"],
     oneLiner:
       "Auto-generate a one-page meeting brief 30 minutes before every external meeting and deliver it to the rep's inbox and Slack.",
+    firstPrinciples:
+      "Synthesis is a routing problem, not a generation problem. Five sources, four meeting types — the agent's real work is deciding which source answers which field for which meeting shape, then summarizing the slice. The creative move is the dispatch function, not the LLM call at the end. Every failure mode a brief has — hallucinated execs, stale news, irrelevant context — traces back to a routing mistake upstream, not a bad prompt.",
     topPerformerMove:
       "The best AE already builds her own pre-call brief by hand. Five tabs: Salesforce, Gong, ZoomInfo, Clay, last quarter's deal review notes. Fifteen to twenty minutes of synthesis before every meeting. The agent shadows her exact process — same sources, same priorities, same talking-point hierarchy — and ships the brief to her inbox before she'd have opened the first tab.",
     roiMath: {
@@ -96,49 +272,50 @@ export const TICKETS: Ticket[] = [
     architecture: [
       {
         layer: 1,
-        name: "Sense — Salesforce Platform Event Subscription",
+        name: "Sense — SFDC Platform Event Wakes Claude Code",
         detail:
-          "A Workato recipe subscribes to Salesforce Platform Events on Activity. When a new external meeting is created or updated within the next 24 hours, the recipe fires immediately and passes meeting metadata downstream. No polling tax, no 5-minute jitter on the 30-minute SLA.",
-        tools: ["salesforce", "workato"],
+          "Salesforce Platform Event on Activity fires when a new external meeting is created or updated in the next 24 hours. A Vercel API route receives the event and invokes Claude Code inside Vercel Sandbox. No polling tax, no 5-minute jitter on the 30-minute SLA.",
+        tools: ["salesforce", "mcp", "vercel-sandbox", "claude-code"],
       },
       {
         layer: 2,
-        name: "Hydrate — Pull Gong, ZoomInfo, Clay in Parallel",
+        name: "Hydrate — Claude Code Calls Clay via MCP",
         detail:
-          "Workato pulls account history from SFDC, last-three-call summaries from Gong, and firmographic + contact detail via a ZoomInfo → Clay waterfall (Clay also surfaces LinkedIn-derived signal like recent posts and job changes, which we pick up through Clay rather than direct LinkedIn API since Sales Navigator API is closed to new partners). Filters by meeting type (discovery / expansion / renewal / check-in) to scope what gets pulled.",
-        tools: ["salesforce", "gong", "zoominfo", "clay", "workato"],
+          "Claude Code's first tool call is Clay via MCP. Clay is the flexible orchestration layer for one-off per-meeting enrichment — it wraps ZoomInfo, Clearbit, Apollo, LinkedIn-derived signal, and Gong's call history behind a single call, scoped by meeting type (discovery / expansion / renewal / check-in). One MCP call, one round trip, no hand-rolled waterfall code.",
+        tools: ["clay", "gong", "mcp"],
       },
       {
         layer: 3,
-        name: "Decide — Claude Synthesizes the One-Pager",
+        name: "Decide — Claude Code Synthesizes and Validates",
         detail:
-          "Vercel AI SDK v6 calls Claude Sonnet via the AI Gateway with a structured prompt and the source data. Returns a typed object validated against a Zod schema. Tool-calling fetches additional context only when needed (e.g., 'find more recent news about this firm').",
-        tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
+          "Claude Code (Sonnet 4.6 via AI Gateway) synthesizes the one-pager from the hydrated context, requires inline citations for every claim, and validates the output against a Zod schema. Tool-calling fetches additional context only when the base inputs are insufficient — e.g., 'the firm just had a merger, pull the last 7 days of news before finalizing.'",
+        tools: ["claude-code", "claude", "vercel-ai-gateway"],
       },
       {
         layer: 4,
-        name: "Validate — Schema, Citation Audit, Dedupe",
+        name: "Pause — Claude Code Emits Slack HITL and Exits",
         detail:
-          "TypeScript validation layer checks the output against the Zod schema, ensures every claim has a citation back to a source row, deduplicates against the last brief sent for the same meeting, and renders into both a React Email template (for Resend) and a Slack Block Kit message (for Vercel Chat SDK).",
-        tools: ["vercel-ai-sdk"],
+          "Claude Code writes the draft to Snowflake pending_briefs with a unique brief_id, posts a Vercel Chat SDK card to Slack with approve / edit / reject buttons, and exits. No process stays resident waiting. State lives in Snowflake. A Slack webhook on rep action wakes a second Claude Code burst inside a fresh Sandbox.",
+        tools: ["snowflake", "vercel-chat-sdk", "slack"],
       },
       {
         layer: 5,
-        name: "Deliver + Record — Resend Email, Slack DM, Snowflake Log",
+        name: "Act + Record — Second Burst Delivers and Logs",
         detail:
-          "Email ships via Resend transactional API (Vercel-native SDK, React Email templates). Slack DM ships via Vercel Chat SDK. Both fire 30 minutes before meeting start so the rep sees the brief in surfaces they already use. Every generation — inputs, model reasoning, delivery receipts, 👍/👎 — streams to Snowflake as the canonical audit trail and prompt-retune source.",
-        tools: ["resend", "slack", "vercel-chat-sdk", "snowflake"],
+          "On rep approve, a second Claude Code burst reads the brief state from Snowflake, ships the email via Resend (React Email template), confirms in Slack, and writes the full audit trail — inputs, model reasoning, delivery receipts, and 👍/👎 — to Snowflake brief_outcomes. On edit, the rep's modified draft replaces the original before delivery. On reject, the outcome logs and the flow ends silently.",
+        tools: ["resend", "slack", "vercel-chat-sdk", "snowflake", "claude-code"],
       },
     ],
     stack: [
       "salesforce",
       "gong",
-      "zoominfo",
       "clay",
-      "workato",
-      "vercel-ai-sdk",
-      "vercel-ai-gateway",
+      "claude-code",
+      "mcp",
+      "vercel-sandbox",
+      "vercel-cron",
       "claude",
+      "vercel-ai-gateway",
       "snowflake",
       "resend",
       "vercel-chat-sdk",
@@ -148,42 +325,42 @@ export const TICKETS: Ticket[] = [
       {
         phase: 1,
         weekRange: "Week 1",
-        title: "Gold set and data pull",
+        title: "Gold set and MCP wiring",
         tasks: [
-          "Shadow three top AEs for half a day. Watch them build briefs by hand. Time each step.",
+          "Shadow three top AEs for half a day each. Watch them build briefs by hand. Time every step, note which tab answers which question.",
           "Collect 50 hand-written briefs from the top three AEs. This is the golden set — the eval target.",
           "Define the Zod schema for a brief (sections, fields, citation format).",
-          "Build the Workato recipe subscribing to SFDC Platform Events. Wire up parallel fetchers for Gong, ZoomInfo, and Clay against five sample meetings. Validate end-to-end data flow before AI is in the loop.",
+          "Wire the Salesforce, Clay, and Gong MCP servers into a Claude Code project. Point them at a test Vercel Sandbox environment and verify the first end-to-end dry run against five sample meetings before AI enters the loop.",
         ],
       },
       {
         phase: 2,
         weekRange: "Week 2",
-        title: "AI synthesis with pass^k=1 citation coverage",
+        title: "Synthesis prompt to pass^k=1 on citations",
         tasks: [
-          "Build the AI SDK route that calls Claude Sonnet via AI Gateway.",
-          "Iterate on the system prompt until pass^k=1 on citation coverage across the 50-task golden set (every claim traceable to a source row).",
-          "Grader agreement >80% on brief quality vs the top-AE hand-written versions.",
-          "Lock the brief template. Ship React Email template for Resend and Block Kit message for Vercel Chat SDK.",
+          "Build the Claude Code prompt for synthesis. Keep it under 200 lines — the routing logic lives in the MCP calls, not the prompt.",
+          "Iterate against the 50-task golden set until pass^k=1 on citation coverage (every claim traceable to a source row).",
+          "Grader agreement >80% on brief quality vs the top-AE hand-written versions, measured by a blind human rubric.",
+          "Lock the brief template. Ship the React Email template for Resend and the Block Kit card for Vercel Chat SDK.",
         ],
       },
       {
         phase: 3,
         weekRange: "Week 3",
-        title: "Canary pod rollout",
+        title: "Canary pod with shadow mode first",
         tasks: [
           "Deploy to one of Rob's enterprise pods as the canary group.",
-          "Run in shadow mode for 48 hours (generate but don't send). Manual review on every brief.",
+          "Run in shadow mode for 48 hours (generate but don't send). Manually review every brief.",
           "Flip to live delivery. Monitor generation rate, open rate, and 👍/👎 feedback for 5 business days. Triage failures via Linear.",
         ],
       },
       {
         phase: 4,
         weekRange: "Week 4",
-        title: "Full rollout",
+        title: "Full rollout and handoff",
         tasks: [
           "Address canary feedback. Roll out to the rest of the team.",
-          "Document the runbook in Notion. Hand recipe ownership to RevOps for ongoing tuning.",
+          "Document the runbook in Notion. Hand ongoing MCP server ownership and prompt tuning to RevOps.",
         ],
       },
     ],
@@ -204,7 +381,7 @@ export const TICKETS: Ticket[] = [
         risk: "Data freshness lag — Gong call summaries are 2 hours behind, ZoomInfo data is 7 days stale.",
         likelihood: "Medium",
         mitigation:
-          "Workato sync runs every hour for hot data, daily for cold. The brief always includes a 'data freshness' line so the rep knows.",
+          "Clay's enrichment refresh runs hourly on hot accounts and daily on cold ones via the MCP server's cached fetch. The brief always includes a 'data freshness' line so the rep knows which fields are live and which are cached.",
       },
       {
         risk: "LLM hallucinates a fact that does not appear in source data.",
@@ -250,6 +427,8 @@ export const TICKETS: Ticket[] = [
     labels: ["prospecting", "intelligence", "firecrawl", "relationship-graph"],
     oneLiner:
       "Build a Firecrawl /agent workflow that extracts every named client company from a law firm's public website. Surfaces the corporate relationships hiding in attorney bios.",
+    firstPrinciples:
+      "Entity resolution as graph stitching. The three data surfaces — representative experience pages, client lists, attorney bios — aren't redundant sources of the same data. They're complementary fragments of one relationship graph that the top researcher reconstructs in her head as she clicks around. The agent's real job is reconstructing that graph and collapsing the mentions into canonical accounts. The crawl is the easy part; the graph is the work.",
     topPerformerMove:
       "Your best researcher already knows where law firm client data hides — practice-group representative experience, attorney bio deal tombstones, news mentions of closed matters. Nobody writes it down. It lives in her muscle memory. The agent doesn't replace her intuition; it encodes the three-surfaces insight into one careful prompt and lets Firecrawl /agent do the legwork at firm-portfolio scale.",
     roiMath: {
@@ -278,47 +457,50 @@ export const TICKETS: Ticket[] = [
     architecture: [
       {
         layer: 1,
-        name: "Sense — Law Firm Domain Queue",
+        name: "Sense — Nightly Cron Pulls Firm Queue from SFDC",
         detail:
-          "Salesforce account list filtered to law firm domains. One firm per workflow execution. Workato recipe pulls the queue daily and fans out to the workflow runtime.",
-        tools: ["salesforce", "workato"],
+          "Vercel Cron fires nightly. Claude Code spins up inside Vercel Sandbox, reads the law firm account queue from SFDC via MCP, and processes one firm per execution so each crawl has isolated state and failure domain.",
+        tools: ["salesforce", "mcp", "vercel-sandbox", "vercel-cron", "claude-code"],
       },
       {
         layer: 2,
-        name: "Scope — Sitemap Discovery for Candidate URLs",
+        name: "Scope — Firecrawl Sitemap Discovery",
         detail:
-          "Optional sitemap.xml fetch to identify candidate pages: practice group landing pages, attorney bio pages, news/insights pages. Provides scope hints to /agent so it does not have to crawl blind. Falls back to root domain if no sitemap is exposed.",
-        tools: ["firecrawl"],
+          "Claude Code calls Firecrawl via MCP for a sitemap.xml discovery pass on the firm's domain. Candidate URLs are scoped to practice-group pages, attorney bios, news/insights, and deal tombstones before the heavy /agent call runs, so credits aren't burned crawling marketing pages.",
+        tools: ["firecrawl", "mcp"],
       },
       {
         layer: 3,
         name: "Decide — Single Firecrawl /agent Call",
         detail:
-          "One call to Firecrawl /agent (the natural-language agent endpoint launched February 2026) with the discovered URL set and a tightly scoped prompt: 'Find all explicitly named client companies on [firm domain]. Look in representative experience sections, client lists, attorney bios, and deal tombstones. Only return companies named directly, skip generic descriptions like a leading technology company. Include the context of how they were mentioned.' /agent handles JS rendering, pagination, and rate limiting natively via its Spark 1 models. Only the prompt is required; URLs are optional scope hints.",
-        tools: ["firecrawl", "vercel-ai-sdk"],
+          "Claude Code calls Firecrawl /agent (the natural-language agent endpoint, launched February 2026) with the scoped URL set and a tightly written prompt: find every explicitly named client company across the three data surfaces, include attribution context, skip generic descriptors like 'a leading technology company,' and return structured JSON. /agent handles JS rendering, pagination, and rate limiting natively via Spark 1.",
+        tools: ["firecrawl", "mcp", "claude-code"],
       },
       {
         layer: 4,
-        name: "Validate — Entity Resolution, Dedupe, Cross-Reference",
+        name: "Resolve — Graph Stitching via Clay",
         detail:
-          "Each extracted company runs through Clay's company-match for entity resolution — 'Morgan Stanley,' 'Morgan Stanley & Co.,' and 'MS Wealth Management' collapse to one canonical account. Then deduped against existing Salesforce accounts, tagged with source URL, attorney name, work type, and mention context. Cross-referenced against the customer base to flag cross-sell signals (existing Harvey customer surfaced as firm's client) or prospecting signals (ICP fit, not yet customer). Residual generic descriptors filtered via a deterministic regex on phrasing patterns.",
-        tools: ["clay", "snowflake", "salesforce"],
+          "Claude Code calls Clay via MCP for entity resolution. Clay's company-match collapses 'Morgan Stanley,' 'Morgan Stanley & Co.,' and 'MS Wealth Management' into one canonical account. Each resolved company is cross-referenced against SFDC (also via MCP) to tag cross-sell signals (existing Harvey customer surfaced as firm's client) and prospecting signals (ICP fit, not yet customer). Residual generic descriptors filter out via a deterministic regex.",
+        tools: ["clay", "salesforce", "mcp"],
       },
       {
         layer: 5,
-        name: "Deliver + Record — Snowflake Write, Slack Cross-Sell Signal",
+        name: "Record + Deliver — Snowflake Write, Slack Digest",
         detail:
-          "Structured client list written to Snowflake firm_client_mapping table for aggregation across the entire firm portfolio. AE who owns the law firm receives a Slack DM: 'Cool & Associates works with 47 named companies. 12 are Harvey ICP fit. 3 are existing Harvey customers — cross-sell opportunity.' High-confidence prospecting signals push to Salesforce as new account candidates with the source firm attached for context. Every extraction and tagging decision logs to Snowflake so AEs can audit how the graph was built.",
-        tools: ["snowflake", "salesforce", "slack"],
+          "Claude Code writes the resolved graph to Snowflake firm_client_mapping (one row per canonical firm→client pair with attribution metadata). The owning AE gets a Slack DM via Vercel Chat SDK: 'Cool & Associates works with 47 named companies. 12 are Harvey ICP fit. 3 are existing Harvey customers — cross-sell opportunity.' High-confidence prospecting signals push to SFDC as new account candidates with provenance attached.",
+        tools: ["snowflake", "salesforce", "vercel-chat-sdk", "slack", "mcp"],
       },
     ],
     stack: [
       "salesforce",
       "firecrawl",
       "clay",
-      "vercel-ai-sdk",
-      "vercel-workflows",
-      "workato",
+      "claude-code",
+      "mcp",
+      "vercel-sandbox",
+      "vercel-cron",
+      "claude",
+      "vercel-ai-gateway",
       "snowflake",
       "vercel-chat-sdk",
       "slack",
@@ -349,9 +531,9 @@ export const TICKETS: Ticket[] = [
       {
         phase: 2,
         weekRange: "Week 2",
-        title: "Scheduled execution and Slack delivery",
+        title: "Scheduled Sandbox runs and Slack delivery",
         tasks: [
-          "Wrap the /agent call + post-processing in a Vercel Workflows scheduled job that runs nightly across the firm pipeline.",
+          "Wrap the Claude Code agent in a Vercel Cron trigger that invokes Sandbox nightly across the firm pipeline. Budget cap per firm enforced via step-level credit checks.",
           "Build the Slack notification via Vercel Chat SDK with cross-sell and prospecting signal counts per firm.",
           "Shadow mode for 48 hours (generate but don't write to production tables). Manual review on every output.",
           "Flip to live writes. Roll out to one AE pod as canary. Monitor false positive rate, AE engagement, and surfaced cross-sell volume for five business days. Document the runbook in Notion.",
@@ -432,6 +614,8 @@ export const TICKETS: Ticket[] = [
     labels: ["lead-routing", "segmentation", "foundation"],
     oneLiner:
       "Auto-classify every inbound lead into the right Harvey segment within 5 minutes of arrival, route to the right rep pool, enroll in the right sequence.",
+    firstPrinciples:
+      "Classification is encoded judgment, not LLM guessing. The top AmLaw enterprise rep's 30-second pattern match on four signals (title, firm domain, jurisdiction, prior context) is the oracle — the agent's job is to replay that pattern match on every lead and write down why. The reasoning string is the product as much as the classification itself, because it's what makes the decision auditable, retunable, and trustworthy to the rep who inherits the lead downstream.",
     topPerformerMove:
       "The best AmLaw enterprise rep knows when a lead is 'corporate legal, not law firm' within 30 seconds of opening it. He pattern-matches on title, firm domain, jurisdiction, and prior context — the same four signals every time. The classifier encodes his 30-second decision and runs it on every lead within 5 minutes of arrival, with a written reasoning string so every rep downstream can trust it.",
     roiMath: {
@@ -457,49 +641,49 @@ export const TICKETS: Ticket[] = [
     architecture: [
       {
         layer: 1,
-        name: "Sense — Marketo / Qualified Form Webhook",
+        name: "Sense — Marketo / Qualified Webhook Wakes Claude Code",
         detail:
-          "When a lead fills a form on harvey.ai, schedules a demo via Qualified, or crosses an MQL threshold in Marketo, a webhook fires into a Vercel API route. Includes the lead's email, company, role, and any captured form fields.",
-        tools: ["marketo", "qualified"],
+          "When a lead fills a form on harvey.ai, schedules a demo via Qualified, or crosses an MQL threshold in Marketo, a webhook hits a Vercel API route and invokes Claude Code inside Vercel Sandbox. The lead payload (email, company, role, captured form fields) is passed in as initial state.",
+        tools: ["marketo", "qualified", "mcp", "vercel-sandbox", "claude-code"],
       },
       {
         layer: 2,
-        name: "Hydrate — ZoomInfo Primary, Clay on Miss",
+        name: "Hydrate — Claude Code Calls Scalestack via MCP",
         detail:
-          "ZoomInfo's Enrich API is the primary firmographic and contact source. On miss (international firms where ZoomInfo is weak, newer AmLaw corporate clients), fall back to Clay's waterfall enrichment which layers 50+ providers natively. One primary, one fallback — no three-vendor kitchen sink. Capture firm size, jurisdiction, practice areas, technographic (M365 footprint matters for the Copilot integration), and the contact's exact role.",
-        tools: ["zoominfo", "clay"],
+          "Claude Code's first tool call is Scalestack via MCP. Scalestack is the enterprise orchestration layer for bulk managed enrichment — it wraps ZoomInfo, Clearbit, Apollo, Cognism, G2, and 60+ other providers behind a single call with sub-3-second latency and 92%+ B2B match rate. One MCP call, one round trip, one billing envelope — not a three-vendor kitchen sink the agent has to reconcile in code.",
+        tools: ["scalestack", "mcp"],
       },
       {
         layer: 3,
-        name: "Decide — Claude Classifies with Reasoning String",
+        name: "Decide — Claude Code Classifies with Reasoning String",
         detail:
-          "Vercel AI SDK v6 calls Claude Sonnet via the AI Gateway. The model receives the enriched lead profile and classifies into one of four segments with a confidence score and a written reasoning string the rep will actually read. Tool calling fetches additional context (recent firm news, jurisdiction-specific signals) only when the base inputs are insufficient.",
-        tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
+          "Claude Code (Sonnet 4.6 via AI Gateway) receives the enriched lead profile and classifies into one of four segments — AmLaw 100, international law, corporate legal, asset manager — with a confidence score and a written reasoning string the rep will actually read. Tool calling fetches additional context (recent firm news, jurisdiction-specific signals) only when the base inputs aren't enough.",
+        tools: ["claude-code", "claude", "vercel-ai-gateway"],
       },
       {
         layer: 4,
-        name: "Route — Per-Segment Rules, Confidence Gate",
+        name: "Route — Confidence Gate with Slack HITL on Ambiguity",
         detail:
-          "Apply per-segment routing rules. AmLaw 100 routes to former-BigLaw enterprise AE pool. Corporate legal routes to the corporate sales specialist pool. International routes to the regional pool with jurisdiction match. Asset managers route to the asset manager specialist pool (PE / hedge fund / family office buyers). Confidence below 85% routes to human review queue. Dedupe against existing accounts.",
-        tools: ["workato", "salesforce"],
+          "High-confidence classifications (>0.85) auto-route. AmLaw 100 → former-BigLaw enterprise AE pool. Corporate legal → corporate sales specialist pool. International → regional pool with jurisdiction match. Asset managers → PE/hedge fund/family office specialist pool. Low-confidence classifications pause the agent, post a Slack HITL card to RevOps via Chat SDK, and wait for human resolution. The human decision wakes a second Claude Code burst for final routing.",
+        tools: ["salesforce", "vercel-chat-sdk", "slack"],
       },
       {
         layer: 5,
-        name: "Deliver + Record — SFDC Update, Sequence Enrollment, Slack DM",
+        name: "Deliver + Record — SFDC Update, Sequence Enrollment, Retune Feed",
         detail:
-          "Salesforce Lead record is updated with segment, confidence score, and reasoning. Marketo enrolls the lead into the segment-specific nurture sequence. The owning rep receives a Slack DM with the brief and the reasoning so they trust the classification. Every classification and misclassification flag streams to Snowflake for monthly retune.",
-        tools: ["salesforce", "marketo", "slack", "snowflake"],
+          "SFDC Lead record updates with segment, confidence score, and reasoning string via MCP. Marketo enrolls the lead into the segment-specific nurture. The owning rep receives a Slack DM with the brief and the reasoning so they trust the classification. Every classification (auto-routed or HITL-resolved) and every misclassification flag streams to Snowflake for the monthly prompt retune.",
+        tools: ["salesforce", "marketo", "snowflake", "vercel-chat-sdk", "slack"],
       },
     ],
     stack: [
       "marketo",
       "qualified",
-      "zoominfo",
-      "clay",
-      "vercel-ai-sdk",
-      "vercel-ai-gateway",
+      "scalestack",
+      "claude-code",
+      "mcp",
+      "vercel-sandbox",
       "claude",
-      "workato",
+      "vercel-ai-gateway",
       "salesforce",
       "snowflake",
       "vercel-chat-sdk",
@@ -519,19 +703,19 @@ export const TICKETS: Ticket[] = [
       {
         phase: 2,
         weekRange: "Week 2",
-        title: "Build the ZoomInfo → Clay enrichment path",
+        title: "Wire Scalestack MCP and validate coverage",
         tasks: [
-          "Build the ZoomInfo primary + Clay fallback enrichment in Workato. Explicit stop-on-hit rule so we never pay both vendors for the same lead.",
-          "Run all 500 historical leads through the enrichment path. Validate completeness (≥95% of leads get enough data to classify).",
-          "Identify any data gaps that would block classification and route those to human review explicitly.",
+          "Wire Scalestack as an MCP server into the Claude Code project. One tool call per lead, no hand-rolled waterfall code.",
+          "Run all 500 historical leads through the Scalestack enrichment path. Validate completeness (≥95% of leads get enough data to classify).",
+          "Identify any data gaps that would block classification — those leads route to human review explicitly rather than being force-classified.",
         ],
       },
       {
         phase: 3,
         weekRange: "Week 3",
-        title: "Claude classification + confusion matrix backtest",
+        title: "Classification prompt + confusion matrix backtest",
         tasks: [
-          "Build the AI SDK route with Claude classification.",
+          "Write the Claude Code classification prompt with the four-segment rubric and reasoning-string requirement.",
           "Run the classifier against the 500-lead backtest set. Build the confusion matrix.",
           "Target ≥85% precision on AmLaw 100 and corporate legal (the high-value classes), ≥80% on asset managers and international.",
           "Iterate the prompt until the matrix hits targets. Every misclassification is a training example for the retune job.",
@@ -542,7 +726,7 @@ export const TICKETS: Ticket[] = [
         weekRange: "Week 4",
         title: "Shadow mode → canary → production",
         tasks: [
-          "Wire routing rules in Workato + Salesforce flows. Build the human review queue for low-confidence leads.",
+          "Wire the SFDC MCP write-back and the Slack HITL escalation for low-confidence leads.",
           "Run in shadow mode for 5 business days (classify but don't route). Daily confusion matrix review with Rob.",
           "Flip to canary pod. Monitor misclassification rate daily. Full rollout once the first week holds below 5%.",
         ],
@@ -611,6 +795,8 @@ export const TICKETS: Ticket[] = [
     labels: ["product-led-growth", "expansion", "agent-builder"],
     oneLiner:
       "Daily detection of which existing customers are showing 'ready for Agent Builder' product signals. Routes value hypothesis to the AE.",
+    firstPrinciples:
+      "Revealed preference beats stated preference. What a customer says in a QBR is aspirational. What they do in the product every day is honest. The three signal thresholds aren't a scoring model — they're the top CSM's mental checklist for 'this customer is telling me they're ready' via their behavior. The agent is a translator from revealed preference to value hypothesis, in the CSM's own voice, daily.",
     topPerformerMove:
       "The best CSM already knows which customers are Agent Builder ready. Once a week she opens the product analytics tab and scans for three signals in the same order: (1) custom workflow count in Assistant crossing a threshold, (2) multi-step flows hitting the execution ceiling, (3) weekly active users on the customer's innovation team trending up. The agent runs her exact mental checklist daily across the full customer base and routes only the matches — plus a written value hypothesis naming the specific workflows that would convert.",
     roiMath: {
@@ -636,48 +822,49 @@ export const TICKETS: Ticket[] = [
     architecture: [
       {
         layer: 1,
-        name: "Sense — Daily Product Analytics Pull",
+        name: "Sense — Daily Cron Fires Claude Code Against Product Analytics",
         detail:
-          "Fivetran replicates Harvey's product analytics database into Snowflake hourly. The Agent Builder signal job reads from a `product_usage` table that has workflow counts, execution metadata, and active user counts per customer per day.",
-        tools: ["fivetran", "snowflake"],
+          "Vercel Cron fires Claude Code inside Vercel Sandbox every morning at 6am Pacific. Fivetran has already replicated Harvey's product analytics into Snowflake hourly overnight. Claude Code reads from `product_usage` via the Snowflake MCP server — workflow counts, execution metadata, active user counts per customer per day.",
+        tools: ["fivetran", "snowflake", "mcp", "vercel-sandbox", "vercel-cron", "claude-code"],
       },
       {
         layer: 2,
-        name: "Filter — The Three Signals the Top CSM Scans For",
+        name: "Filter — The Top CSM's Three-Signal Mental Checklist",
         detail:
-          "Snowflake query filters customers down to those hitting all three signals the best CSM watches for every week: (1) 10+ custom workflows created in Assistant in the last 30 days, (2) at least one multi-step workflow hitting the Assistant execution ceiling, (3) weekly active users among innovation-team users trending up 20%+ over a rolling 4-week window. The exact thresholds are set by shadowing the CSM before launch — not invented. This shrinks the candidate set from thousands to dozens.",
-        tools: ["snowflake"],
+          "Claude Code runs the three-signal filter that the top CSM scans for every week: (1) 10+ custom workflows created in Assistant in the last 30 days, (2) at least one multi-step workflow hitting the Assistant execution ceiling, (3) weekly active users among innovation-team users trending up 20%+ over a rolling 4-week window. The exact thresholds are fixed by shadowing the top CSM before launch, not invented. The filter shrinks the candidate set from thousands to dozens before the LLM enters the loop.",
+        tools: ["snowflake", "mcp"],
       },
       {
         layer: 3,
-        name: "Decide — Claude Drafts the Value Hypothesis",
+        name: "Decide — Claude Code Drafts the Value Hypothesis",
         detail:
-          "For each candidate customer, Vercel AI SDK calls Claude Sonnet via the AI Gateway with the customer's specific usage profile and any open opportunities. The model returns a typed JSON object containing: a written value hypothesis, the three specific workflows that would benefit most from Agent Builder, the suggested first conversation framing, and a confidence score.",
-        tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
+          "For each candidate customer, Claude Code (Sonnet 4.6) synthesizes a value hypothesis from the customer's usage profile and any open opportunities. Returns a typed object: written hypothesis, the three specific workflows that would benefit most from Agent Builder, the suggested first conversation framing, and a confidence score. The prompt is tuned against 20 historical upgrade stories so the hypothesis sounds like what the CSM would actually say — not generic upsell boilerplate.",
+        tools: ["claude-code", "claude", "vercel-ai-gateway"],
       },
       {
         layer: 4,
         name: "Score — Dedupe, Suppress, Route by Ownership",
         detail:
-          "Apply a final scoring rubric. Filter out customers in active procurement, in renewal negotiation, or with an existing Agent Builder opportunity. Dedupe against signals sent in the last 14 days. Route each remaining signal to the account-owning AE based on Salesforce ownership.",
-        tools: ["workato", "salesforce"],
+          "Claude Code applies a final rubric via MCP calls: filter out customers in active procurement or renewal negotiation, suppress customers with an existing Agent Builder opportunity, dedupe against signals sent in the last 14 days. Each surviving signal routes to the account-owning AE based on SFDC ownership.",
+        tools: ["salesforce", "mcp"],
       },
       {
         layer: 5,
-        name: "Deliver + Record — SFDC Task, Catalyst Event, Slack HITL",
+        name: "Deliver + Record — SFDC Task, Catalyst Event, Slack HITL Feedback Loop",
         detail:
-          "Create a Salesforce task on the account with the value hypothesis as the description. Log the same signal as a Catalyst (Totango) customer engagement event so CS sees it alongside their own account notes. Send the AE a Slack DM via Vercel Chat SDK with the signal, the hypothesis, and three one-click buttons: 'actioned,' 'not yet,' or 'wrong fit.' Every button press streams to `upsell_signal_feedback` in Snowflake. A weekly retune job reads the feedback table and adjusts the filter thresholds and prompt wording — the feedback loop is closed, not decorative.",
-        tools: ["salesforce", "catalyst", "vercel-chat-sdk", "slack", "snowflake"],
+          "Claude Code creates a Salesforce task on the account with the value hypothesis as the description, logs the same signal as a Catalyst (Totango) customer engagement event so CS sees it alongside their own account notes, and sends the AE a Slack DM via Vercel Chat SDK with three one-click buttons: actioned, not yet, wrong fit. Every button press streams to `upsell_signal_feedback` in Snowflake. A weekly retune job reads the feedback table and adjusts the filter thresholds and prompt wording — the feedback loop is closed, not decorative.",
+        tools: ["salesforce", "catalyst", "vercel-chat-sdk", "slack", "snowflake", "mcp"],
       },
     ],
     stack: [
       "fivetran",
       "snowflake",
-      "workato",
-      "vercel-ai-sdk",
-      "vercel-ai-gateway",
+      "claude-code",
+      "mcp",
+      "vercel-sandbox",
+      "vercel-cron",
       "claude",
-      "vercel-workflows",
+      "vercel-ai-gateway",
       "salesforce",
       "catalyst",
       "vercel-chat-sdk",
@@ -708,12 +895,12 @@ export const TICKETS: Ticket[] = [
       {
         phase: 3,
         weekRange: "Week 3",
-        title: "Production rollout via Vercel Workflows scheduled job",
+        title: "Production rollout via Vercel Cron + Sandbox",
         tasks: [
-          "Wire up Vercel Workflows to run the job daily at 6am Pacific.",
-          "Build the Slack delivery flow with the actioned/not yet/wrong fit feedback buttons.",
-          "Wire the feedback loop back to Snowflake so we can monitor signal quality over time.",
-          "Roll out. Monitor signal-to-action rate weekly.",
+          "Wire Vercel Cron to invoke Claude Code inside Sandbox daily at 6am Pacific.",
+          "Build the Slack delivery flow via Vercel Chat SDK with the actioned/not yet/wrong fit feedback buttons.",
+          "Wire the feedback loop back to Snowflake `upsell_signal_feedback` so the weekly retune job can adjust thresholds and prompt wording.",
+          "Roll out. Monitor signal-to-action rate weekly with Rob and John.",
         ],
       },
     ],
@@ -771,163 +958,6 @@ export const TICKETS: Ticket[] = [
 
   {
     id: "GTM-005",
-    title: "Post-Call Commitment Tracker",
-    priority: "P1",
-    effort: "2 weeks",
-    sprint: "Month 2",
-    status: "ready",
-    reporter: "Rob Saliterman, VP Sales",
-    labels: ["deal-velocity", "commitment-tracking", "rep-hygiene"],
-    oneLiner:
-      "Parse every Gong call for commitments the Harvey rep made to the customer, auto-create SFDC tasks with due dates, and confirm with the rep in Slack before anything writes to the opp.",
-    topPerformerMove:
-      "The best AE keeps a notebook on her desk of 'things I said I'd do.' After every customer call she scans the Gong transcript while it's fresh, pulls the commitments into her task list, and clears them within 24 hours. Below-average reps drop roughly 30% of commitments on the floor. The workflow runs her exact scan on every call the team takes — the rep still owns the commitments, the agent just stops them from falling through.",
-    roiMath: {
-      cost: "$12K eng + ~$600/mo Claude API",
-      savings: "Recovers dropped commitments that stall AmLaw procurement. Two rescued $200K-ACV deals per quarter is a conservative floor.",
-      multiplier: "~50x first-year return if the floor holds",
-      payback: "First rescued deal",
-    },
-    background: [
-      "Harvey's AmLaw and enterprise sales cycles are 3-6 months and commitment-dense. Every customer call produces 2-5 rep-side commitments — 'I'll send the security questionnaire Friday,' 'we'll run the model card by our research team,' 'let me pull the sample outputs for your practice group by Wednesday.' Each one is a load-bearing promise to a General Counsel who equates 'forgot to send' with 'not a serious vendor.'",
-      "Top AEs track commitments obsessively and clear them inside 24 hours. Below-average reps drop roughly 30%, and those drops correlate with deals that stall in weeks 4-8 of procurement. The rep thinks the lull is the security review; the customer is waiting on the thing the rep forgot to send in week 2.",
-      "This workflow encodes the top AE's exact process — watch the Gong transcript right after the call ends, copy commitments into a list with due dates, work the list — and runs it automatically across every call the team takes. The rep reviews and confirms. The system never creates a task without a human tap.",
-      "Reuses the Gong infrastructure stood up for GTM-001 (Pre-Call Brief). Additive cost is minimal because the data is already flowing.",
-    ],
-    acceptanceCriteria: [
-      "Every Gong call the Harvey sales team records is automatically parsed for rep-side commitments within 5 minutes of call end.",
-      "Commitments are extracted with speaker attribution (only commitments made by the Harvey rep), natural-language due dates normalized to ISO, and a confidence score per commitment.",
-      "The rep receives a Slack DM via Vercel Chat SDK within 5 minutes of call end with the extracted commitments and three one-click buttons per commitment: confirm, edit, or reject. No SFDC task is created until the rep confirms.",
-      "Confirmed commitments become SFDC tasks on the opportunity with the due date, the verbatim commitment text, and a link back to the Gong call.",
-      "Every confirm/edit/reject streams to Snowflake `rep_commitments` as training data for the weekly prompt retune.",
-      "Speaker attribution is pass^k=1 on a 20-call gold set: the system never attributes a customer commitment to the Harvey rep.",
-      "If confidence on every commitment in a call is below threshold, the system fails silently — it never fabricates a commitment or sends a noisy 'nothing found' DM.",
-    ],
-    architecture: [
-      {
-        layer: 1,
-        name: "Sense — Gong Webhook on Call-Ended",
-        detail:
-          "Gong webhook fires when a call is transcribed and ready. A Vercel API route receives the payload, extracts callId and opportunity association, and enqueues downstream work via a Vercel Workflows durable job.",
-        tools: ["gong", "vercel-workflows"],
-      },
-      {
-        layer: 2,
-        name: "Hydrate — Pull Transcript and Opportunity Context",
-        detail:
-          "Gong `/calls/{id}/transcript` returns the full transcript with speaker attribution. SFDC is pulled for opportunity stage, deal size, and last-meeting context. The three inputs feed the decide step.",
-        tools: ["gong", "salesforce"],
-      },
-      {
-        layer: 3,
-        name: "Decide — Claude Extracts Rep-Side Commitments",
-        detail:
-          "Vercel AI SDK v6 calls Claude Sonnet via the AI Gateway with a focused prompt: extract every commitment the Harvey rep made, require speaker attribution, return verbatim text plus ISO due date plus confidence score plus the 30-second transcript window around where it was spoken. Zod schema validates the output. Confidence below 0.7 drops the commitment. Speaker attribution below 0.8 drops the commitment. Better to miss than to misattribute.",
-        tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
-      },
-      {
-        layer: 4,
-        name: "Validate — Confidence Gate, Dedupe, Format",
-        detail:
-          "Deterministic layer filters commitments below the confidence threshold, deduplicates against commitments already extracted from the same call (safety net for re-runs), and renders each surviving commitment into a Slack Block Kit card with Confirm / Edit / Reject buttons. If zero commitments survive the gate, no DM is sent.",
-        tools: ["vercel-ai-sdk"],
-      },
-      {
-        layer: 5,
-        name: "Deliver + Record — Slack HITL, SFDC on Confirm, Snowflake Log",
-        detail:
-          "Vercel Chat SDK posts the Slack DM. On Confirm, an SFDC task is created on the opp with due date and Gong source link. On Edit, a Slack modal lets the rep adjust the text or date before the task is created. On Reject, the commitment is logged as rejected training data. Every outcome streams to Snowflake `rep_commitments` for the weekly retune and for Rob's weekly completion-rate report.",
-        tools: ["vercel-chat-sdk", "slack", "salesforce", "snowflake"],
-      },
-    ],
-    stack: [
-      "gong",
-      "salesforce",
-      "vercel-workflows",
-      "vercel-ai-sdk",
-      "vercel-ai-gateway",
-      "claude",
-      "vercel-chat-sdk",
-      "slack",
-      "snowflake",
-    ],
-    implementation: [
-      {
-        phase: 1,
-        weekRange: "Week 1",
-        title: "Shadow, gold set, extraction",
-        tasks: [
-          "Shadow one top AE for a morning. Watch how she tracks commitments today. Time the scan step.",
-          "Pull 20 recent Gong calls with known outcomes from high-value opps. Manually extract rep-side commitments into the gold set.",
-          "Build the Claude extraction prompt. Iterate until ≥90% recall and ≥90% precision against the gold set. Speaker attribution is non-negotiable — pass^k=1 or the ticket doesn't ship.",
-        ],
-      },
-      {
-        phase: 2,
-        weekRange: "Week 2",
-        title: "Slack HITL, SFDC write, canary",
-        tasks: [
-          "Build the Vercel API route that receives Gong webhooks and enqueues the durable workflow step.",
-          "Build the Slack Block Kit card with Confirm / Edit / Reject via Vercel Chat SDK. Build the SFDC task write on Confirm and the edit-modal handler.",
-          "Wire `rep_commitments` logging to Snowflake.",
-          "Ship to one AE pod as canary. Monitor confirm / edit / reject ratio for 5 business days. Daily review with Rob.",
-        ],
-      },
-    ],
-    risks: [
-      {
-        risk: "Extraction misses commitments a human would have caught.",
-        likelihood: "Medium",
-        mitigation:
-          "Gold set backtest against 20 hand-extracted calls. Threshold tuned for recall before precision (better to surface an extra commitment the rep rejects than to miss a real one). Reps can flag missed commitments via a Gong comment that feeds the retune job.",
-      },
-      {
-        risk: "Customer-side commitments leak into the rep's task list.",
-        likelihood: "Low",
-        mitigation:
-          "Speaker attribution is hard-gated at confidence 0.8. Misattribution is a trust-killer so the system drops any ambiguous commitment rather than guessing.",
-      },
-      {
-        risk: "Vague commitments ('I'll get back to you') create useless tasks.",
-        likelihood: "Medium",
-        mitigation:
-          "The prompt explicitly instructs the model to skip commitments without a specific deliverable or due date. 'I'll send the security questionnaire by Friday' ships; 'I'll follow up' gets dropped.",
-      },
-      {
-        risk: "Reps ignore the Slack DMs because the volume is too high.",
-        likelihood: "Low",
-        mitigation:
-          "Confidence thresholds cap most calls at 1-3 surfaced commitments. If a rep gets more than 5 per day, the thresholds auto-raise via the retune job.",
-      },
-    ],
-    validation: [
-      {
-        metric: "Speaker attribution accuracy",
-        target: "pass^k=1 on the 20-call gold set",
-        why: "Misattributing a customer commitment to the rep is the one mistake that kills trust permanently. Zero tolerance.",
-      },
-      {
-        metric: "Extraction recall",
-        target: "≥90% of hand-extracted commitments on the gold set",
-        why: "Below this, reps can't trust the system to catch the load-bearing promises.",
-      },
-      {
-        metric: "Rep rejection rate",
-        target: "<10% of surfaced commitments",
-        why: "Above this, the DMs become noise and the system dies from opt-out.",
-      },
-      {
-        metric: "Rep completion rate on confirmed commitments",
-        target: "≥80% within 24 hours",
-        why: "The whole point. If reps confirm but don't complete, the workflow is surfacing noise, not fixing behavior.",
-      },
-    ],
-    whyThisMatters:
-      "Harvey sells to General Counsels and managing partners who measure vendor seriousness by how precisely promises are kept. Enterprise cycles are commitment-dense by nature, and dropped commitments are one of the top reasons deals stall out in weeks 4-8 of procurement. Top AEs track these obsessively. Most AEs don't. This workflow turns the top performer's private notebook into a team-wide system. Cheap to build, reuses Gong and SFDC infrastructure from GTM-001, and directly addresses Harvey's rep-ramp dependency on ex-Big Law attorneys who have relationship instincts but not necessarily CRM hygiene.",
-  },
-
-  {
-    id: "GTM-006",
     title: "Competitive Mention Radar",
     priority: "P1",
     effort: "2 weeks",
@@ -937,6 +967,8 @@ export const TICKETS: Ticket[] = [
     labels: ["competitive", "battlecard", "deal-velocity"],
     oneLiner:
       "Daily scan of Gong calls and SFDC email sync for competitor mentions. Classify intent, match to the battlecard, and DM the owning AE with a tailored counter before the next customer touchpoint.",
+    firstPrinciples:
+      "Latency is the product. The value here isn't classification accuracy or battlecard comprehensiveness — it's how fast a sharpened counter reaches the AE after a customer mention. This is an ambient, reactive agent, not a batch report. A 90% accurate counter delivered within 5 minutes beats a 99% accurate counter delivered the next day, every time.",
     topPerformerMove:
       "The best AE has battlecard reflexes. When she hears 'we're also evaluating Legora' she has a three-sentence counter ready in the next breath — name one thing Harvey does that the competitor can't, acknowledge the thing the competitor does better, redirect to the outcome the customer actually cares about. Most reps hear the same competitor name and freeze, then send a generic follow-up email that pretends the mention never happened. This workflow gives every AE the top AE's reflex on every call.",
     roiMath: {
@@ -963,38 +995,38 @@ export const TICKETS: Ticket[] = [
     architecture: [
       {
         layer: 1,
-        name: "Sense — Gong + SFDC Sync into Snowflake",
+        name: "Sense — Vercel Cron Fires Claude Code Against Fresh Transcripts",
         detail:
-          "Fivetran replicates the last Gong transcript batch and the last SFDC email thread batch into Snowflake every hour. The competitive radar query runs against new rows only to avoid reprocessing historical data.",
-        tools: ["gong", "salesforce", "fivetran", "snowflake"],
+          "Vercel Cron fires Claude Code inside Sandbox every 4 hours. Fivetran has already replicated the last 4 hours of Gong transcripts and SFDC email sync rows into Snowflake. Claude Code reads only the new rows via the Snowflake MCP server — no historical reprocessing.",
+        tools: ["gong", "salesforce", "fivetran", "snowflake", "mcp", "vercel-sandbox", "vercel-cron", "claude-code"],
       },
       {
         layer: 2,
         name: "Filter — Keyword Prefilter with Notion-Sourced Keyword List",
         detail:
-          "A deterministic Snowflake query filters new rows for competitor name mentions. The keyword list lives in Notion and is re-read on every run, so Rob can add a new competitor in 10 seconds without a deploy. This shrinks the LLM workload from every call to only the calls where a mention is plausible.",
-        tools: ["snowflake", "notion"],
+          "Claude Code pulls the current competitor keyword list from Notion via MCP and runs a deterministic prefilter over the new rows. The keyword list is version-controlled and Rob can add a new competitor in 10 seconds without a deploy. This shrinks the LLM workload from every call to only the calls where a mention is plausible.",
+        tools: ["notion", "snowflake", "mcp"],
       },
       {
         layer: 3,
         name: "Decide — Claude Classifies Mention + Extracts Objection",
         detail:
-          "For each flagged mention, Vercel AI SDK v6 calls Claude Sonnet via the AI Gateway with the 30-second context window around the mention, customer history, and the current Notion battlecard. Returns a typed JSON object: competitor name, classification (exploratory / active eval / committed / internal build), objection text in the customer's own words, matched battlecard counter, and a confidence score. The prompt explicitly disambiguates 'co-counsel' (legal term) from 'CoCounsel' (product).",
-        tools: ["vercel-ai-sdk", "vercel-ai-gateway", "claude"],
+          "For each flagged mention, Claude Code (Sonnet 4.6 via AI Gateway) reads the 30-second context window around the mention, the customer history, and the current Notion battlecard. Returns a typed object: competitor name, classification (exploratory / active eval / committed / internal build), objection text in the customer's own words, matched battlecard counter, and a confidence score. The prompt explicitly disambiguates 'co-counsel' (legal term) from 'CoCounsel' (Thomson Reuters product).",
+        tools: ["claude-code", "claude", "vercel-ai-gateway"],
       },
       {
         layer: 4,
-        name: "Validate — Confidence Gate, Dedupe",
+        name: "Validate — Confidence Gate, 7-Day Dedupe",
         detail:
-          "Filter out mentions below 0.75 confidence. Deduplicate against mentions already flagged in the last 7 days for the same (AE, customer, competitor) triple. Silent failure on zero hits.",
-        tools: ["vercel-ai-sdk"],
+          "Claude Code filters out mentions below 0.75 confidence and deduplicates against mentions already flagged in the last 7 days for the same (AE, customer, competitor) triple. Silent failure on zero hits — no 'nothing happened' DMs.",
+        tools: ["claude-code", "snowflake", "mcp"],
       },
       {
         layer: 5,
-        name: "Deliver + Record — Slack DM, Snowflake Log, Weekly Digest to Rob",
+        name: "Deliver + Record — Slack DM, Snowflake Log, Weekly Digest",
         detail:
-          "Vercel Chat SDK posts the Slack DM to the account-owning AE with the mention context, classification, objection, battlecard counter, and a one-click 'insert into next email' modal. Every mention and outcome streams to Snowflake `competitive_mentions`. The weekly digest to Rob pulls from that table — mention counts per competitor, insertion rate per AE, unclassified AI legal tool mentions.",
-        tools: ["vercel-chat-sdk", "slack", "snowflake"],
+          "Claude Code posts the Slack DM via Vercel Chat SDK to the account-owning AE with the mention context, classification, objection, battlecard counter, and a one-click 'insert into next email' modal. Every mention and outcome streams to Snowflake `competitive_mentions`. The weekly digest to Rob pulls from that table — mention counts per competitor, insertion rate per AE, and any unclassified AI legal tool mentions that could indicate a new entrant.",
+        tools: ["vercel-chat-sdk", "slack", "snowflake", "mcp"],
       },
     ],
     stack: [
@@ -1003,10 +1035,12 @@ export const TICKETS: Ticket[] = [
       "fivetran",
       "snowflake",
       "notion",
-      "vercel-ai-sdk",
-      "vercel-ai-gateway",
+      "claude-code",
+      "mcp",
+      "vercel-sandbox",
+      "vercel-cron",
       "claude",
-      "vercel-workflows",
+      "vercel-ai-gateway",
       "vercel-chat-sdk",
       "slack",
     ],
@@ -1082,7 +1116,157 @@ export const TICKETS: Ticket[] = [
       },
     ],
     whyThisMatters:
-      "The AmLaw legal AI market is four serious players deep and getting deeper. Legora is growing fast. CoCounsel is reframing the category around authoritative research. Foundation-model competitors are a structural squeeze from below. Every competitive mention in a customer conversation is a hinge — a weak response loses the deal, a sharp one bends it. This workflow arms every AE with the top AE's battlecard reflex on every call, keeps the battlecard current because the source of truth is a Notion doc Rob updates weekly, and turns competitive intel into a shipping ritual rather than a quarterly slide deck. It reuses the Gong and SFDC infrastructure from GTM-001 and GTM-005 — additive cost is minimal because the data is already in Snowflake.",
+      "The AmLaw legal AI market is four serious players deep and getting deeper. Legora is growing fast. CoCounsel is reframing the category around authoritative research. Foundation-model competitors are a structural squeeze from below. Every competitive mention in a customer conversation is a hinge — a weak response loses the deal, a sharp one bends it. This workflow arms every AE with the top AE's battlecard reflex on every call, keeps the battlecard current because the source of truth is a Notion doc Rob updates weekly, and turns competitive intel into a shipping ritual rather than a quarterly slide deck. It reuses the Gong and SFDC infrastructure from GTM-001 — additive cost is minimal because the data is already in Snowflake.",
+  },
+
+  {
+    id: "GTM-006",
+    title: "Systems Governance — Weekly Data Integrity Audit",
+    priority: "P1",
+    effort: "2 weeks",
+    sprint: "Month 3",
+    status: "ready",
+    reporter: "GTM Technology",
+    labels: ["data-integrity", "governance", "infrastructure", "recurring"],
+    oneLiner:
+      "Weekly Claude Code audit of SFDC data quality. Opens Linear tickets for anomalies, publishes a digest to Rob, makes data hygiene a system rather than a quarterly firedrill.",
+    firstPrinciples:
+      "Clean data compounds. Every dirty row — the duplicate account, the orphan contact, the opportunity with no owner, the stale pipeline record — poisons every downstream workflow invisibly. The agent's job isn't to fix the data. It's to make data quality a first-class weekly observable so the RevOps team can keep ahead of the mess instead of quarterly firedrill-ing out of it.",
+    topPerformerMove:
+      "The best RevOps lead already spot-checks data quality every Monday morning — pulls a Snowflake query, scans for the usual suspects (dupes, orphans, missing owners, stale pipelines), opens a handful of Linear tickets, moves on. The agent encodes her exact query logic and her exact triage rules and runs them every week at the same level of discipline, without requiring her Monday morning.",
+    roiMath: {
+      cost: "~$10K eng + ~$300/mo Claude API",
+      savings: "Prevents the data quality decay that poisons every other workflow on this board. Compounds weekly.",
+      multiplier: "Not directly ARR-attributable, but every workflow's accuracy depends on this floor",
+      payback: "First week the data quality score moves off zero",
+    },
+    background: [
+      "The GTM Business Analyst job description lists 'Systems Governance — data integrity, deduplication, system audits' as one of five core responsibilities. This ticket operationalizes that responsibility as a weekly recurring workflow rather than a quarterly firedrill.",
+      "Right now data quality at Harvey is handled reactively: a RevOps lead notices the pipeline is a mess, runs a one-off audit, a team cleans up, and the cycle repeats 90 days later. In between, every workflow downstream quietly absorbs the decay. GTM-003 Lead Routing can't route correctly if the account hierarchy is wrong. GTM-004 Agent Builder signals can't fire correctly if ownership is ambiguous. GTM-002 Firm Client Mapping poisons the graph if duplicates aren't resolved.",
+      "This ticket converts that cadence from quarterly reactive to weekly proactive. A Claude Code agent runs every Monday morning, pulls the SFDC data quality snapshot from Snowflake, runs deterministic checks, uses Claude only where deterministic rules can't disambiguate (e.g., 'is this account a duplicate of that one given similar names but different domains'), opens Linear tickets for each issue class with affected row counts, and publishes a digest to Rob showing the week-over-week data quality score.",
+      "The audit doesn't fix anything autonomously. It makes the problem visible on a weekly rhythm so the RevOps team can keep ahead of it without relying on one person noticing.",
+    ],
+    acceptanceCriteria: [
+      "A scheduled Claude Code run fires every Monday at 6am Pacific inside Vercel Sandbox via Vercel Cron.",
+      "Six data quality checks run deterministically against Snowflake: duplicate account detection (fuzzy match on name + domain), orphan contact detection, ownership conflict detection, stale pipeline detection (opps past stage SLA), missing required field detection, bad email format detection.",
+      "Claude is called only for the duplicate account check where deterministic matching is ambiguous. Every other check is pure SQL — no LLM cost, no LLM drift.",
+      "Each anomaly class becomes one Linear ticket per week with the affected row count attached and a query link to the underlying Snowflake rows.",
+      "A weekly digest posts to #gtm-tech-governance Slack by 7am Pacific Monday via Vercel Chat SDK: overall data quality score (0-100), week-over-week delta, top three issue classes by row count.",
+      "The weekly score streams to Snowflake `data_quality_weekly` as a time series for trend analysis.",
+      "Dupe disambiguation prompt is pass^k=1 on a 20-case gold set of known dupes and non-dupes before the ticket ships. No false-positive merges ever get auto-suggested.",
+    ],
+    architecture: [
+      {
+        layer: 1,
+        name: "Sense — Monday Cron Fires Claude Code",
+        detail:
+          "Vercel Cron fires Claude Code inside Vercel Sandbox every Monday at 6am Pacific. Claude Code reads the current SFDC data snapshot from Snowflake via MCP — accounts, contacts, opportunities, ownership, activity timestamps.",
+        tools: ["snowflake", "mcp", "vercel-sandbox", "vercel-cron", "claude-code"],
+      },
+      {
+        layer: 2,
+        name: "Check — Six Deterministic SQL Checks",
+        detail:
+          "Claude Code runs six parameterized Snowflake queries: duplicate accounts (fuzzy match on name + domain), orphan contacts, ownership conflicts, stale pipeline records, missing required fields, bad email formats. Each query returns a row count and a query link. No LLM involvement at this layer — deterministic is cheap, fast, and auditable.",
+        tools: ["snowflake", "mcp"],
+      },
+      {
+        layer: 3,
+        name: "Disambiguate — LLM Only for Ambiguous Dupes",
+        detail:
+          "For duplicate-account candidates where the deterministic check returns 'maybe' (similar names, different domains, similar URLs), Claude Code calls the LLM with the candidate pair and the full account metadata. Returns a merge recommendation with confidence. Anything below 0.85 stays flagged for human review rather than being auto-suggested.",
+        tools: ["claude-code", "claude", "vercel-ai-gateway"],
+      },
+      {
+        layer: 4,
+        name: "Record — Linear Tickets + Snowflake Trend",
+        detail:
+          "Claude Code opens one Linear ticket per issue class for the week via MCP, attaches the row counts and Snowflake query links, and tags the RevOps owner. Writes the weekly data quality score and per-class counts to Snowflake `data_quality_weekly` as a time series.",
+        tools: ["linear", "snowflake", "mcp"],
+      },
+      {
+        layer: 5,
+        name: "Deliver — Monday Morning Digest to Slack",
+        detail:
+          "Claude Code posts the weekly digest to #gtm-tech-governance via Vercel Chat SDK by 7am Pacific Monday: overall data quality score, week-over-week delta, top three issue classes, and links to the Linear tickets just opened. Rob, John, and James are in the channel.",
+        tools: ["vercel-chat-sdk", "slack", "mcp"],
+      },
+    ],
+    stack: [
+      "snowflake",
+      "salesforce",
+      "claude-code",
+      "mcp",
+      "vercel-sandbox",
+      "vercel-cron",
+      "claude",
+      "vercel-ai-gateway",
+      "linear",
+      "vercel-chat-sdk",
+      "slack",
+    ],
+    implementation: [
+      {
+        phase: 1,
+        weekRange: "Week 1",
+        title: "Deterministic check queries + dupe gold set",
+        tasks: [
+          "Build the six Snowflake queries for the deterministic data quality checks. Validate each against known manual findings from the GTM-000 data integrity audit.",
+          "Build the 20-case dupe detection gold set from real dupes and real non-dupes sourced from the Month 1 audit.",
+          "Write the Claude Code prompt for dupe disambiguation. Iterate until pass^k=1 on the gold set — zero false merges allowed.",
+        ],
+      },
+      {
+        phase: 2,
+        weekRange: "Week 2",
+        title: "Linear integration, digest, canary Monday",
+        tasks: [
+          "Wire the Linear and Snowflake MCP servers into Claude Code. Open one test ticket per issue class against a dev Linear project.",
+          "Build the Vercel Chat SDK digest for the #gtm-tech-governance Slack channel.",
+          "Schedule the Monday 6am cron. Run a canary Monday where outputs go to a dev Linear project and a private Slack channel. Validate the digest looks right.",
+          "Flip to production Monday. Publish the first real digest with Rob, John, and James in the channel.",
+        ],
+      },
+    ],
+    risks: [
+      {
+        risk: "False-positive duplicate detection suggests merging two legitimately different accounts.",
+        likelihood: "High",
+        mitigation:
+          "Dupe disambiguation below 0.85 confidence never auto-suggests a merge — it flags for human review. Pass^k=1 on the 20-case gold set before ship. Rob or the RevOps lead makes the merge call, not the agent.",
+      },
+      {
+        risk: "Weekly Linear ticket volume overwhelms RevOps.",
+        likelihood: "Medium",
+        mitigation:
+          "One ticket per issue class per week, not one per anomaly. Row counts attached, not row dumps. The digest is the primary surface; Linear tickets are the backlog source RevOps picks from.",
+      },
+      {
+        risk: "Data quality score becomes a vanity metric that doesn't drive action.",
+        likelihood: "Medium",
+        mitigation:
+          "Weekly review with Rob establishes the score as a real KPI. If it trends flat or down for two consecutive weeks, the function prioritizes cleanup work over new workflow builds. Baked into the Month 2+ operating cadence.",
+      },
+    ],
+    validation: [
+      {
+        metric: "Dupe disambiguation accuracy on gold set",
+        target: "pass^k=1 on 20-case gold set before production ship",
+        why: "False merges are catastrophic and hard to reverse. Zero tolerance floor.",
+      },
+      {
+        metric: "Weekly digest delivered by 7am Monday Pacific",
+        target: "100% of weeks for the first month of production",
+        why: "The rhythm is the product. Miss a Monday and the weekly governance cadence breaks down.",
+      },
+      {
+        metric: "Data quality score trend",
+        target: "Improving or flat over 4-week rolling window",
+        why: "The reason this exists. If the score trends down despite cleanup work, we're losing ground faster than we're fixing it and priorities need to shift.",
+      },
+    ],
+    whyThisMatters:
+      "Data integrity is the GTM BA job description's core responsibility that I was missing entirely from earlier drafts of this roadmap. Systems Governance isn't glamorous but it separates a BA who ships reliable workflows from a BA who ships workflows that quietly corrupt the CRM. Every workflow on this board depends on clean data under the hood — routing can't route correctly with broken hierarchy, expansion signals can't fire with ambiguous ownership, firm mapping can't write to Snowflake without poisoning the graph if dupes aren't resolved. This ticket makes data hygiene a weekly observable rather than a quarterly firedrill, and it's the kind of unsexy infrastructure work that a real GTM BA owns and a LARPing one skips.",
   },
 ];
 
