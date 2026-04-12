@@ -4,7 +4,7 @@ import { SectionHeader } from "./background-section";
 export function ImplementationPhases({ phases }: { phases: ImplementationPhase[] }) {
   return (
     <section>
-      <SectionHeader label="Ship Plan" />
+      <SectionHeader label="Execution Plan" />
       <div className="space-y-4">
         {phases.map((phase, idx) => (
           <div key={phase.phase} className="hairline rounded-sm bg-bg-base">

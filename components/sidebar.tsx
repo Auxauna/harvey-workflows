@@ -2,9 +2,9 @@ import Link from "next/link";
 import { TICKETS } from "@/lib/tickets";
 
 export function Sidebar() {
-  const ready = TICKETS.filter((t) => t.status === "ready").length;
-  const inProgress = TICKETS.filter((t) => t.status === "in_progress").length;
-  const backlog = TICKETS.filter((t) => t.status === "backlog").length;
+  const ready = TICKETS.filter((ticket) => ticket.status === "ready").length;
+  const inProgress = TICKETS.filter((ticket) => ticket.status === "in_progress").length;
+  const backlog = TICKETS.filter((ticket) => ticket.status === "backlog").length;
 
   return (
     <aside className="hairline-r flex h-screen w-64 flex-col bg-bg-subtle">
@@ -13,8 +13,8 @@ export function Sidebar() {
           <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
             GTM Technology
           </div>
-          <div className="font-serif text-base font-medium text-fg-primary mt-1">
-            First 90 Days
+          <div className="mt-1 font-serif text-base font-medium text-fg-primary">
+            Operator Portfolio
           </div>
         </Link>
       </div>
@@ -28,8 +28,14 @@ export function Sidebar() {
           className="flex items-center gap-3 px-5 py-1.5 text-sm text-fg-secondary hover:bg-bg-muted hover:text-fg-primary"
         >
           <span className="h-1.5 w-1.5 rounded-full bg-accent-forest" />
-          All Tickets
-          <span className="ml-auto font-mono text-xs text-fg-muted">{TICKETS.length}</span>
+          Operator Brief + Board
+        </Link>
+        <Link
+          href="/about"
+          className="flex items-center gap-3 px-5 py-1.5 text-sm text-fg-secondary hover:bg-bg-muted hover:text-fg-primary"
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-fg-muted" />
+          Sources + Assumptions
         </Link>
 
         <div className="mt-6 px-5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
@@ -57,14 +63,14 @@ export function Sidebar() {
           Tickets
         </div>
         <div className="space-y-0.5">
-          {TICKETS.map((t) => (
+          {TICKETS.map((ticket) => (
             <Link
-              key={t.id}
-              href={`/tickets/${t.id.toLowerCase()}`}
+              key={ticket.id}
+              href={`/tickets/${ticket.id.toLowerCase()}`}
               className="flex items-center gap-3 px-5 py-1.5 text-sm text-fg-secondary hover:bg-bg-muted hover:text-fg-primary"
             >
-              <span className="font-mono text-[11px] text-fg-muted">{t.id}</span>
-              <span className="truncate">{t.title}</span>
+              <span className="font-mono text-[11px] text-fg-muted">{ticket.id}</span>
+              <span className="truncate">{ticket.title}</span>
             </Link>
           ))}
         </div>
@@ -72,16 +78,10 @@ export function Sidebar() {
 
       <div className="hairline-t px-5 py-4">
         <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
-          Function
+          Focus
         </div>
-        <div className="text-sm text-fg-primary mt-1">GTM Technology</div>
-        <div className="text-xs text-fg-subtle mt-0.5">First 90 Days · Q2 2026</div>
-        <Link
-          href="/about"
-          className="font-mono text-[11px] text-accent-forest hover:underline mt-2 inline-block"
-        >
-          About this roadmap →
-        </Link>
+        <div className="mt-1 text-sm text-fg-primary">Hybrid BA + GTM Engineer</div>
+        <div className="mt-0.5 text-xs text-fg-subtle">Operator-first, pilot-backed</div>
       </div>
     </aside>
   );

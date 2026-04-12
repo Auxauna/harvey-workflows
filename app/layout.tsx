@@ -24,13 +24,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Harvey GTM Technology — First 90 Days",
+  title: "Harvey GTM BA Operator Portfolio",
   description:
-    "A working charter for the GTM Technology function at Harvey. First 90 days, Q2 2026.",
+    "90-day operator-first portfolio for Harvey GTM Technology: governance, prioritization, and three scoped workflow pilots.",
   openGraph: {
-    title: "Harvey GTM Technology — First 90 Days",
+    title: "Harvey GTM BA Operator Portfolio",
     description:
-      "A working charter for the GTM Technology function at Harvey.",
+      "Business-first 90-day GTM operating plan with evidence-backed workflow pilots.",
     type: "website",
   },
   robots: {
@@ -45,13 +45,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${plexSerif.variable} ${plexMono.variable} ${inter.variable}`}
-    >
-      <body className="min-h-screen bg-bg-base text-fg-primary antialiased">
-        {children}
-      </body>
+    <html lang="en" className={`${plexSerif.variable} ${plexMono.variable} ${inter.variable}`}>
+      <body className="min-h-screen bg-bg-base text-fg-primary antialiased">{children}</body>
     </html>
   );
 }

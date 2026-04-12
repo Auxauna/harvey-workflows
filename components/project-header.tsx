@@ -1,40 +1,36 @@
 import { TICKETS } from "@/lib/tickets";
 
 export function ProjectHeader() {
-  const totalEffort = TICKETS.length;
-  const stackSize = new Set(TICKETS.flatMap((t) => t.stack)).size;
+  const pilotCount = TICKETS.filter((ticket) => ticket.id !== "GTM-000").length;
 
   return (
     <header className="hairline-b bg-bg-base px-10 py-10">
       <div className="max-w-5xl">
-        <div className="flex items-center gap-3 mb-3">
+        <div className="mb-3 flex items-center gap-3">
           <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-accent-forest">
-            Charter
+            Interview Portfolio
           </span>
           <span className="h-px w-8 bg-border-strong" />
           <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
-            GTM Technology
+            GTM Business Analyst
           </span>
         </div>
 
-        <h1 className="font-serif text-5xl font-medium text-fg-primary leading-[1.05] tracking-tight">
-          First 90 Days
+        <h1 className="font-serif text-5xl font-medium leading-[1.05] tracking-tight text-fg-primary">
+          90-Day Operator Plan
         </h1>
 
-        <p className="mt-5 text-lg text-fg-secondary leading-relaxed max-w-3xl">
-          A working charter for the first 90 days of GTM Technology at Harvey. The mandate:
-          encode what the top performers in every GTM seat already do by hand, measure what that
-          work is worth in rep time and pipeline impact, and ship the automations that give the
-          time back. What follows is how we&apos;re framing the first 90 days, and a starter set
-          of workflow examples showing how the work ships.
+        <p className="mt-5 max-w-3xl text-lg leading-relaxed text-fg-secondary">
+          Business-first execution plan for Harvey GTM Technology: diagnose the business, establish
+          governance and data clarity, then ship three tightly scoped workflow pilots with measurable
+          outcomes.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
-          <Stat label="Function" value="GTM Technology" />
-          <Stat label="Sprint" value="First 90 Days" />
-          <Stat label="Quarter" value="Q2 2026" />
-          <Stat label="Tickets" value={String(totalEffort)} />
-          <Stat label="Tools in Stack" value={String(stackSize)} />
+          <Stat label="Operating Split" value="80% Operator / 20% Build" />
+          <Stat label="Primary Asset" value="Operator Brief" />
+          <Stat label="Pilot Workflows" value={String(pilotCount)} />
+          <Stat label="Evidence Status" value="Verified + Assumptions Tagged" />
         </div>
       </div>
     </header>
@@ -45,7 +41,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-fg-muted">{label}</div>
-      <div className="text-sm text-fg-primary mt-0.5">{value}</div>
+      <div className="mt-0.5 text-sm text-fg-primary">{value}</div>
     </div>
   );
 }

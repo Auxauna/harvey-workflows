@@ -42,10 +42,10 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
         </button>
         <div className="flex flex-col items-center">
           <div className="font-mono text-[9px] uppercase tracking-[0.12em] text-fg-muted">
-            GTM Technology
+            Operator Portfolio
           </div>
           <div className="font-serif text-sm font-medium text-fg-primary leading-tight">
-            First 90 Days
+            90-Day Plan
           </div>
         </div>
         <div className="w-9" aria-hidden="true" />
