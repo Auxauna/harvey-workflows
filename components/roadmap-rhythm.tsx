@@ -1,35 +1,33 @@
-const MONTHS = [
+const PHASES = [
   {
-    label: "Month 1",
-    theme: "Diagnose (BA work)",
+    label: "Days 1-30",
+    theme: "Diagnose + Align",
     items: [
-      "Shadow 5 top performers (3 AEs, 2 CSMs)",
-      "Interview 8 leaders across functions",
-      "Baseline 6 metrics in Snowflake",
-      "Triage existing Linear backlog",
-      "Audit data integrity on top 50 accounts",
-      "Publish diagnostic memo",
-      "Week 4 quick win: ship GTM-001 canary",
+      "Shadow key GTM workflows and run cross-functional interviews",
+      "Publish current-state system map with ownership",
+      "Set KPI baseline and reporting cadence",
+      "Stand up weekly intake + monthly roadmap review",
+      "Finalize pilot gates for GTM-001 to GTM-003",
     ],
   },
   {
-    label: "Month 2",
-    theme: "Translate",
+    label: "Days 31-60",
+    theme: "Ship Core",
     items: [
-      "Convert shadow notes into GTM-002 + GTM-003 requirements",
-      "Ship GTM-005 Competitive Radar on Gong infra",
-      "Begin GTM-002 in shadow mode",
-      "First weekly GTM-Tech review to Rob + John",
+      "Launch GTM-001 Pre-call brief canary",
+      "Launch GTM-002 routing shadow mode",
+      "Track adoption, quality, and exception handling",
+      "Retune based on rep and RevOps feedback",
     ],
   },
   {
-    label: "Month 3",
-    theme: "Ship + Govern",
+    label: "Days 61-90",
+    theme: "Scale + Govern",
     items: [
-      "Ship GTM-002 to production",
-      "Ship GTM-003 with 500-lead confusion matrix",
-      "Stand up GTM-006 Systems Governance (Monday audits)",
-      "Defer GTM-004 to Month 4",
+      "Harden GTM-002 with confidence + review controls",
+      "Run GTM-003 competitive assist as scoped innovation pilot",
+      "Publish monthly governance readout",
+      "Lock next-quarter roadmap from measured impact",
     ],
   },
 ];
@@ -44,23 +42,21 @@ export function RoadmapRhythm() {
           </span>
           <span className="h-px flex-1 bg-border-hairline" />
         </div>
-        <div className="hairline rounded-sm bg-bg-base grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[var(--border-hairline)]">
-          {MONTHS.map((month) => (
-            <div key={month.label} className="px-5 py-5">
-              <div className="flex items-baseline justify-between gap-3 mb-3">
+
+        <div className="grid grid-cols-1 divide-[var(--border-hairline)] rounded-sm bg-bg-base hairline md:grid-cols-3 md:divide-x md:divide-y-0">
+          {PHASES.map((phase) => (
+            <div key={phase.label} className="px-5 py-5">
+              <div className="mb-3 flex items-baseline justify-between gap-3">
                 <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-accent-forest">
-                  {month.label}
+                  {phase.label}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-fg-muted text-right">
-                  {month.theme}
+                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-right text-fg-muted">
+                  {phase.theme}
                 </span>
               </div>
               <ul className="space-y-1.5">
-                {month.items.map((item, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-2 text-sm text-fg-secondary leading-snug"
-                  >
+                {phase.items.map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm leading-snug text-fg-secondary">
                     <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-fg-muted" />
                     <span>{item}</span>
                   </li>

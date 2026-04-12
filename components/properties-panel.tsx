@@ -21,9 +21,15 @@ const PRIORITY_LABELS: Record<Ticket["priority"], string> = {
   P3: "P3 — Low",
 };
 
+const CLAIM_STYLE = {
+  verified: "bg-accent-forest-bg text-accent-forest",
+  assumption: "bg-accent-amber-bg text-accent-amber",
+  hypothesis: "bg-accent-claret-bg text-accent-claret",
+} as const;
+
 export function PropertiesPanel({ ticket }: { ticket: Ticket }) {
   return (
-    <aside className="hairline rounded-sm bg-bg-subtle p-5 space-y-4">
+    <aside className="hairline space-y-4 rounded-sm bg-bg-subtle p-5">
       <Field label="Status">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${STATUS_DOT[ticket.status]}`} />
@@ -31,30 +37,42 @@ export function PropertiesPanel({ ticket }: { ticket: Ticket }) {
         </div>
       </Field>
 
+      <Field label="Claim Status">
+        <span
+          className={`inline-block rounded-sm px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${CLAIM_STYLE[ticket.claimStatus]}`}
+        >
+          {ticket.claimStatus}
+        </span>
+      </Field>
+
       <Field label="Priority">
         <span className="text-sm text-fg-primary">{PRIORITY_LABELS[ticket.priority]}</span>
       </Field>
 
       <Field label="Effort">
-        <span className="text-sm text-fg-primary font-mono tabular-nums">{ticket.effort}</span>
+        <span className="font-mono text-sm tabular-nums text-fg-primary">{ticket.effort}</span>
       </Field>
 
       <Field label="Sprint">
         <span className="text-sm text-fg-primary">{ticket.sprint}</span>
       </Field>
 
-      <Field label="Reporter">
-        <span className="text-sm text-fg-primary">{ticket.reporter}</span>
+      <Field label="Owner">
+        <span className="text-sm text-fg-primary">{ticket.evidence.owner}</span>
+      </Field>
+
+      <Field label="Primary Metric">
+        <span className="text-sm text-fg-primary">{ticket.evidence.metric}</span>
       </Field>
 
       <Field label="Labels">
         <div className="flex flex-wrap gap-1">
-          {ticket.labels.map((l) => (
+          {ticket.labels.map((label) => (
             <span
-              key={l}
+              key={label}
               className="hairline rounded-sm bg-bg-base px-1.5 py-0.5 font-mono text-[10px] text-fg-secondary"
             >
-              {l}
+              {label}
             </span>
           ))}
         </div>
@@ -66,9 +84,7 @@ export function PropertiesPanel({ ticket }: { ticket: Ticket }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-fg-muted mb-1.5">
-        {label}
-      </div>
+      <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-muted">{label}</div>
       {children}
     </div>
   );
